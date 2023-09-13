@@ -109,8 +109,41 @@
         </model>
 
         <include>
-            <uri>model:///home/unitree/catkin_ws/src/ros_unitree/unitree_ros/unitree_gazebo/worlds/building_editor_models/stairs</uri>
+            <uri>model:///home/pranav/catkin_ws/src/ros_unitree/unitree_ros/unitree_gazebo/worlds/building_editor_models/stairs</uri>
         </include>
-
+        <actor name="actor1">
+            <pose>0.09691 -0.484341 0 0 -0 0</pose>
+            <skin>
+                <filename>walk.dae</filename>
+                <scale>1.0</scale>
+            </skin>
+            <animation name="walking">
+                <filename>walk.dae</filename>
+                <scale>1.000000</scale>
+                <interpolate_x>true</interpolate_x>
+            </animation>
+            <!-- plugin definition -->
+            <plugin name="actor1_plugin" filename="libPedestrianSFMPlugin.so">
+                <velocity>0.9</velocity>
+                <radius>0.4</radius>
+                <animation_factor>5.1</animation_factor>
+                <people_distance>6.0</people_distance>
+                    <!-- weights -->
+                <goal_weight>2.0</goal_weight>
+                <obstacle_weight>80.0</obstacle_weight>
+                <social_weight>15</social_weight>
+                <group_gaze_weight>3.0</group_gaze_weight>
+                <group_coh_weight>2.0</group_coh_weight>
+                <group_rep_weight>1.0</group_rep_weight>
+                <ignore_obstacles>
+                    <model>ground_plane</model>
+                </ignore_obstacles>
+                <trajectory>
+                    <cyclic>true</cyclic>
+                    <waypoint>-1 2 1.25</waypoint>
+                    <waypoint>-1 -8 1.25</waypoint>
+                </trajectory>
+            </plugin>
+        </actor>
     </world>
 </sdf>

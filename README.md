@@ -78,22 +78,11 @@ The full list of transitions between states available is the following:
 * Key '9': FixedStand to SwingTest
 * Key '0': FixedStand to BalanceTest
 
-# Gazebo Worlds
-
-The worlds included in this repository are simple worlds and they should be used for dedug purposes. If you want to add more realistc worlds, you can clone the repository [gazebo_worlds](https://github.com/macc-n/gazebo_worlds).
-After following the instructions for the usage, you can specify which world you want to load with the argument `wname`:
-
-```
-roslaunch unitree_gazebo robot_simulation.launch rname:=go1 wname:=office_small
-```
-
-![World loaded in Gazebo](./doc/unitree_go1_gazebo_world.png)
-
 # Mapping
 
 Start the simulation in Gazebo:
 ```
-roslaunch unitree_gazebo robot_simulation.launch rname:=go1 wname:=office_small rviz:=false
+roslaunch unitree_gazebo robot_simulation.launch rname:=go1 wname:=earth rviz:=false
 ```
 
 Start the robot controller:
@@ -116,13 +105,13 @@ During the mapping process, Rviz should show something similar to the following 
 
 Save the map:
 ```
-rosrun map_server map_saver -f ~/catkin_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/office_small
+rosrun map_server map_saver -f ~/catkin_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/earth
 ```
 
 # Navigation
 Start the simulation in Gazebo:
 ```
-roslaunch unitree_gazebo robot_simulation.launch rname:=go1 wname:=office_small rviz:=false
+roslaunch unitree_gazebo robot_simulation.launch rname:=go1 wname:=earth rviz:=false
 ```
 
 Start the robot controller:
@@ -133,7 +122,7 @@ and press the keys '2' and '5' to activate the MoveBase mode.
 
 Start the navigation stack:
 ```
-roslaunch unitree_navigation navigation.launch rname:=go1 map_file:=/home/unitree/catkin_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/office_small.yaml
+roslaunch unitree_navigation navigation.launch rname:=go1 map_file:=/home/unitree/catkin_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/earth.yaml
 ```
 
 In Rviz, first set the initial position of the robot with the "2D Pose Estimate" button. Next, set a navigation goal with the "2D Nav Goal" button.
@@ -174,17 +163,3 @@ rosrun unitree_controller unitree_move_kinetic
 ```
 The robot will turn around the origin, which is the movement under the world coordinate frame. And inside of the source file [move_publisher.cpp](https://github.com/unitreerobotics/unitree_ros/blob/master/unitree_controller/src/move_publisher.cpp), we also provide the method to move using the robot coordinate frame. You can change the value of `def_frame` to `coord::ROBOT` and run the catkin_make again, then the `unitree_move_publisher` will move robot under its own coordinate frame.
 
-## z1_controller
-
-You can launch the z1 Gazebo simulation with the following command:
-
-```
-roslaunch unitree_gazebo z1.launch
-```
-
-After launching the gazebo simulation, you can start to control the z1 robot by z1_sdk.  
-see [z1_documentation](dev-z1.unitree.com/5-sdk/run.html)  
-You can also send ros commands directly to z1 robot:
-```
-rosrun z1_controller unitree_move_z1
-```
