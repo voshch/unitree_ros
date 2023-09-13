@@ -40,13 +40,6 @@ catkin_make
 
 If you face a dependency problem, you can just run `catkin_make` again.
 
-# Robots Description
-The description of robots Go1, A1, Aliengo, and Laikago. Each package includes mesh, urdf and xacro files of robot. Take Go1 for example, you can check the model in Rviz by:
-```
-roslaunch go1_description go1_rviz.launch
-```
-![Go1 in Rviz](./doc/unitree_go1_rviz.png)
-
 # Start the Simulation
 Open a terminal and start Gazebo with a preloaded world:
 ```
@@ -54,19 +47,13 @@ roslaunch unitree_gazebo robot_simulation.launch rname:=go1 wname:=earth
 ```
 Where the `rname` means robot name, which can be `laikago`, `aliengo`, `a1` or `go1`. The `wname` means world name, which can be `earth`, `space` or `stairs`. And the default value of `rname` is `go1`, while the default value of `wname` is `earth`. In Gazebo, the robot should be lying on the ground with joints not activated.
 
-![Go1 in Passive state](./doc/unitree_go1_gazebo_1.png)
-
 For starting the controller, open a new terminal, then run the following command:
 ```
 rosrun unitree_guide junior_ctrl
 ```
 After starting the controller, the robot will lie on the ground of the simulator, then press the '2' key on the keyboard to switch the robot's finite state machine (FSM) from Passive(initial state) to FixedStand, then press the '4' key to switch the FSM from FixedStand to Trotting
 
-![Go1 in Trotting state](./doc/unitree_go1_gazebo_2.png)
-
 Now you can press the 'W', 'A', 'S', 'D' keys to control the translation of the robot, and press the 'J', 'L' keys to control the rotation of the robot. Press the 'Spacebar', the robot will stop and stand on the ground. If there is no response, you need to click on the terminal opened for starting the controller and then repeat the previous operation.
-
-![Go1 moving](./doc/unitree_go1_gazebo_3.gif)
 
 The full list of transitions between states available is the following:
 * Key '1': FixedStand/FreeStand to Passive
@@ -101,7 +88,6 @@ roslaunch unitree_navigation slam.launch rname:=go1 rviz:=true algorithm:=hector
 In the terminal of the robot controller, press the keys '2' and '4' to set the robot in trotting mode, then, move the robot around the environment to create the map.
 
 During the mapping process, Rviz should show something similar to the following screehshot:
-![Go1 mapping in Rviz](./doc/unitree_go1_mapping_rviz.png)
 
 Save the map:
 ```
@@ -126,8 +112,6 @@ roslaunch unitree_navigation navigation.launch rname:=go1 map_file:=/home/unitre
 ```
 
 In Rviz, first set the initial position of the robot with the "2D Pose Estimate" button. Next, set a navigation goal with the "2D Nav Goal" button.
-
-![Go1 navigation](./doc/unitree_go1_navigation.gif)
 
 ---
 
