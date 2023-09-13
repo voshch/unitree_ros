@@ -1,4 +1,4 @@
-image: /home/pranav/catkin_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/earth.pgm
+image: /home/pranav/quadruped_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/earth.pgm
 resolution: 0.050000
 origin: [-50.000000, -50.000000, 0.000000]
 negate: 0

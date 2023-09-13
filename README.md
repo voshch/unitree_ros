@@ -106,9 +106,11 @@ rosrun unitree_guide junior_ctrl
 ```
 and press the keys '2' and '5' to activate the MoveBase mode.
 
+Before running the below commad, go to unitree_guide/unitree_navigation/maps/earth.yaml and put the correct path of the image file based on your system.
+
 Start the navigation stack:
 ```
-roslaunch unitree_navigation navigation.launch rname:=go1 map_file:=/home/unitree/catkin_ws/src/ros_unitree/unitree_guide/unitree_navigation/maps/earth.yaml
+roslaunch unitree_navigation navigation.launch rname:=go1
 ```
 
 In Rviz, first set the initial position of the robot with the "2D Pose Estimate" button. Next, set a navigation goal with the "2D Nav Goal" button.
