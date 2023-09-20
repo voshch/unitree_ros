@@ -76,6 +76,7 @@ void IOROS::recvState(LowlevelState *state){
 }
 
 void IOROS::initSend(){
+    std::cout << "advertising " << "/" + _robot_name + "_gazebo/XX_YY_controller/command" << std::endl;
     _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_hip_controller/command", 1);
     _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_thigh_controller/command", 1);
     _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_calf_controller/command", 1);
@@ -91,7 +92,10 @@ void IOROS::initSend(){
 }
 
 void IOROS::initRecv(){
-    _imu_sub = _nm.subscribe("/trunk_imu", 1, &IOROS::imuCallback, this);
+    std::string trunk_topic = "/" +  _robot_name + "_0_0" + "/trunk_imu";
+    std::cout << "subscribing " << trunk_topic << std::endl;
+    _imu_sub = _nm.subscribe(trunk_topic, 1, &IOROS::imuCallback, this);
+    std::cout << "subscribing " << "/" + _robot_name + "_gazebo/XX_YY_controller/state" << std::endl;
     _servo_sub[0] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
     _servo_sub[1] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
     _servo_sub[2] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_calf_controller/state", 1, &IOROS::FRcalfCallback, this);

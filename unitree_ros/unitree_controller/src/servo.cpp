@@ -29,7 +29,7 @@ class multiThread
 public:
     multiThread(string rname){
         robot_name = rname;
-        imu_sub = nm.subscribe("/trunk_imu", 1, &multiThread::imuCallback, this);
+        imu_sub = nm.subscribe("/go1_0_0/trunk_imu", 1, &multiThread::imuCallback, this);
         footForce_sub[0] = nm.subscribe("/visual/FR_foot_contact/the_force", 1, &multiThread::FRfootCallback, this);
         footForce_sub[1] = nm.subscribe("/visual/FL_foot_contact/the_force", 1, &multiThread::FLfootCallback, this);
         footForce_sub[2] = nm.subscribe("/visual/RR_foot_contact/the_force", 1, &multiThread::RRfootCallback, this);

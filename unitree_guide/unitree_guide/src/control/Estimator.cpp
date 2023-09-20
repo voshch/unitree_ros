@@ -117,7 +117,7 @@ void Estimator::_initSystem(){
 
     /* ROS odometry publisher */
     #ifdef COMPILE_WITH_MOVE_BASE
-        _pub = _nh.advertise<nav_msgs::Odometry>("odom", 1);
+        _pub = _nh.advertise<nav_msgs::Odometry>("/go1_0_0/odom_pub", 1);
     #endif  // COMPILE_WITH_MOVE_BASE
 }
 
