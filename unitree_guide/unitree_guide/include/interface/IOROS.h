@@ -29,6 +29,8 @@ ros::Subscriber _servo_sub[12], _imu_sub;
 ros::Publisher _servo_pub[12];
 unitree_legged_msgs::LowCmd _lowCmd;
 unitree_legged_msgs::LowState _lowState;
+
+std::vector<std::string> _robot_names;
 std::string _robot_name;
 
 //repeated functions for multi-thread

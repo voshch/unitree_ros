@@ -16,7 +16,8 @@ void RosShutDown(int sig){
 
 IOROS::IOROS():IOInterface(){
     std::cout << "The control interface for ROS Gazebo simulation" << std::endl;
-    ros::param::get("/robot_name", _robot_name);
+    ros::param::get("/robot_names", _robot_names);
+    _robot_name = _robot_names.at(0);
     std::cout << "robot_name: " << _robot_name << std::endl;
 
     // start subscriber
@@ -76,38 +77,38 @@ void IOROS::recvState(LowlevelState *state){
 }
 
 void IOROS::initSend(){
-    std::cout << "advertising " << "/" + _robot_name + "_gazebo/XX_YY_controller/command" << std::endl;
-    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_hip_controller/command", 1);
-    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_thigh_controller/command", 1);
-    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FR_calf_controller/command", 1);
-    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FL_hip_controller/command", 1);
-    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FL_thigh_controller/command", 1);
-    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/FL_calf_controller/command", 1);
-    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RR_hip_controller/command", 1);
-    _servo_pub[7] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RR_thigh_controller/command", 1);
-    _servo_pub[8] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RR_calf_controller/command", 1);
-    _servo_pub[9] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RL_hip_controller/command", 1);
-    _servo_pub[10] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RL_thigh_controller/command", 1);
-    _servo_pub[11] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "_gazebo/RL_calf_controller/command", 1);
+    std::cout << "advertising " << "/" + _robot_name + "/XX_YY_controller/command" << std::endl;
+    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/FR_hip_controller/command", 1);
+    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/FR_thigh_controller/command", 1);
+    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/FR_calf_controller/command", 1);
+    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/FL_hip_controller/command", 1);
+    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/FL_thigh_controller/command", 1);
+    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/FL_calf_controller/command", 1);
+    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/RR_hip_controller/command", 1);
+    _servo_pub[7] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/RR_thigh_controller/command", 1);
+    _servo_pub[8] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/RR_calf_controller/command", 1);
+    _servo_pub[9] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name +  "/RL_hip_controller/command", 1);
+    _servo_pub[10] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "/RL_thigh_controller/command", 1);
+    _servo_pub[11] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/" + _robot_name + "/RL_calf_controller/command", 1);
 }
 
 void IOROS::initRecv(){
-    std::string trunk_topic = "/" +  _robot_name + "_0_0" + "/trunk_imu";
+    std::string trunk_topic = "/" +  _robot_name + "/trunk_imu";
     std::cout << "subscribing " << trunk_topic << std::endl;
     _imu_sub = _nm.subscribe(trunk_topic, 1, &IOROS::imuCallback, this);
-    std::cout << "subscribing " << "/" + _robot_name + "_gazebo/XX_YY_controller/state" << std::endl;
-    _servo_sub[0] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
-    _servo_sub[1] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
-    _servo_sub[2] = _nm.subscribe("/" + _robot_name + "_gazebo/FR_calf_controller/state", 1, &IOROS::FRcalfCallback, this);
-    _servo_sub[3] = _nm.subscribe("/" + _robot_name + "_gazebo/FL_hip_controller/state", 1, &IOROS::FLhipCallback, this);
-    _servo_sub[4] = _nm.subscribe("/" + _robot_name + "_gazebo/FL_thigh_controller/state", 1, &IOROS::FLthighCallback, this);
-    _servo_sub[5] = _nm.subscribe("/" + _robot_name + "_gazebo/FL_calf_controller/state", 1, &IOROS::FLcalfCallback, this);
-    _servo_sub[6] = _nm.subscribe("/" + _robot_name + "_gazebo/RR_hip_controller/state", 1, &IOROS::RRhipCallback, this);
-    _servo_sub[7] = _nm.subscribe("/" + _robot_name + "_gazebo/RR_thigh_controller/state", 1, &IOROS::RRthighCallback, this);
-    _servo_sub[8] = _nm.subscribe("/" + _robot_name + "_gazebo/RR_calf_controller/state", 1, &IOROS::RRcalfCallback, this);
-    _servo_sub[9] = _nm.subscribe("/" + _robot_name + "_gazebo/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
-    _servo_sub[10] = _nm.subscribe("/" + _robot_name + "_gazebo/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
-    _servo_sub[11] = _nm.subscribe("/" + _robot_name + "_gazebo/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
+    std::cout << "subscribing " << "/" + _robot_name + "/XX_YY_controller/state" << std::endl;
+    _servo_sub[0] = _nm.subscribe("/" + _robot_name +  "/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
+    _servo_sub[1] = _nm.subscribe("/" + _robot_name +  "/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
+    _servo_sub[2] = _nm.subscribe("/" + _robot_name +  "/FR_calf_controller/state", 1, &IOROS::FRcalfCallback, this);
+    _servo_sub[3] = _nm.subscribe("/" + _robot_name +  "/FL_hip_controller/state", 1, &IOROS::FLhipCallback, this);
+    _servo_sub[4] = _nm.subscribe("/" + _robot_name +  "/FL_thigh_controller/state", 1, &IOROS::FLthighCallback, this);
+    _servo_sub[5] = _nm.subscribe("/" + _robot_name +  "/FL_calf_controller/state", 1, &IOROS::FLcalfCallback, this);
+    _servo_sub[6] = _nm.subscribe("/" + _robot_name +  "/RR_hip_controller/state", 1, &IOROS::RRhipCallback, this);
+    _servo_sub[7] = _nm.subscribe("/" + _robot_name +  "/RR_thigh_controller/state", 1, &IOROS::RRthighCallback, this);
+    _servo_sub[8] = _nm.subscribe("/" + _robot_name +  "/RR_calf_controller/state", 1, &IOROS::RRcalfCallback, this);
+    _servo_sub[9] = _nm.subscribe("/" + _robot_name +  "/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
+    _servo_sub[10] = _nm.subscribe("/" + _robot_name + "/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
+    _servo_sub[11] = _nm.subscribe("/" + _robot_name + "/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
 }
 
 void IOROS::imuCallback(const sensor_msgs::Imu & msg)

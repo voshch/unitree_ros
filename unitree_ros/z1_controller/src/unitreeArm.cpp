@@ -5,22 +5,22 @@ namespace unitreeArm {
 IOROS::IOROS()
 {
     // publisher init
-    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/Joint01_controller/command", 1);
-    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/Joint02_controller/command", 1);
-    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/Joint03_controller/command", 1);
-    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/Joint04_controller/command", 1);
-    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/Joint05_controller/command", 1);
-    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/Joint06_controller/command", 1);
-    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1_gazebo/gripper_controller/command", 1);
+    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/Joint01_controller/command", 1);
+    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/Joint02_controller/command", 1);
+    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/Joint03_controller/command", 1);
+    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/Joint04_controller/command", 1);
+    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/Joint05_controller/command", 1);
+    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/Joint06_controller/command", 1);
+    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>("/z1/gazebo/gripper_controller/command", 1);
 
     // subscriber init
-    _servo_sub[0] = _nm.subscribe("/z1_gazebo/Joint01_controller/state", 1, &IOROS::_joint01Callback, this);
-    _servo_sub[1] = _nm.subscribe("/z1_gazebo/Joint02_controller/state", 1, &IOROS::_joint02Callback, this);
-    _servo_sub[2] = _nm.subscribe("/z1_gazebo/Joint03_controller/state", 1, &IOROS::_joint03Callback, this);
-    _servo_sub[3] = _nm.subscribe("/z1_gazebo/Joint04_controller/state", 1, &IOROS::_joint04Callback, this);
-    _servo_sub[4] = _nm.subscribe("/z1_gazebo/Joint05_controller/state", 1, &IOROS::_joint05Callback, this);
-    _servo_sub[5] = _nm.subscribe("/z1_gazebo/Joint06_controller/state", 1, &IOROS::_joint06Callback, this);
-    _servo_sub[6] = _nm.subscribe("/z1_gazebo/gripper_controller/state", 1, &IOROS::_gripperCallback, this);
+    _servo_sub[0] = _nm.subscribe("/z1/gazebo/Joint01_controller/state", 1, &IOROS::_joint01Callback, this);
+    _servo_sub[1] = _nm.subscribe("/z1/gazebo/Joint02_controller/state", 1, &IOROS::_joint02Callback, this);
+    _servo_sub[2] = _nm.subscribe("/z1/gazebo/Joint03_controller/state", 1, &IOROS::_joint03Callback, this);
+    _servo_sub[3] = _nm.subscribe("/z1/gazebo/Joint04_controller/state", 1, &IOROS::_joint04Callback, this);
+    _servo_sub[4] = _nm.subscribe("/z1/gazebo/Joint05_controller/state", 1, &IOROS::_joint05Callback, this);
+    _servo_sub[5] = _nm.subscribe("/z1/gazebo/Joint06_controller/state", 1, &IOROS::_joint06Callback, this);
+    _servo_sub[6] = _nm.subscribe("/z1/gazebo/gripper_controller/state", 1, &IOROS::_gripperCallback, this);
 
     // parameter init
     for(size_t i=0; i<7; ++i)

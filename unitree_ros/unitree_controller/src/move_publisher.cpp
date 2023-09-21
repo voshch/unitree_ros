@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
     ros::init(argc, argv, "move_publisher");
     ros::NodeHandle nh;
-    ros::Publisher move_publisher = nh.advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 1000);
+    ros::Publisher move_publisher = nh.advertise<gazebo_msgs::ModelState>("/set_model_state", 1000);
 
     gazebo_msgs::ModelState model_state_pub;
 
@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     ros::param::get("/robot_name", robot_name);
     std::cout << "robot_name: " << robot_name << std::endl;
 
-    model_state_pub.model_name = robot_name + "_gazebo";
+    model_state_pub.model_name = robot_name + "";
     ros::Rate loop_rate(1000);
 
     if(def_frame == coord::WORLD)

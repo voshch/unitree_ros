@@ -34,18 +34,18 @@ public:
         footForce_sub[1] = nm.subscribe("/visual/FL_foot_contact/the_force", 1, &multiThread::FLfootCallback, this);
         footForce_sub[2] = nm.subscribe("/visual/RR_foot_contact/the_force", 1, &multiThread::RRfootCallback, this);
         footForce_sub[3] = nm.subscribe("/visual/RL_foot_contact/the_force", 1, &multiThread::RLfootCallback, this);
-        servo_sub[0] = nm.subscribe("/" + robot_name + "_gazebo/FR_hip_controller/state", 1, &multiThread::FRhipCallback, this);
-        servo_sub[1] = nm.subscribe("/" + robot_name + "_gazebo/FR_thigh_controller/state", 1, &multiThread::FRthighCallback, this);
-        servo_sub[2] = nm.subscribe("/" + robot_name + "_gazebo/FR_calf_controller/state", 1, &multiThread::FRcalfCallback, this);
-        servo_sub[3] = nm.subscribe("/" + robot_name + "_gazebo/FL_hip_controller/state", 1, &multiThread::FLhipCallback, this);
-        servo_sub[4] = nm.subscribe("/" + robot_name + "_gazebo/FL_thigh_controller/state", 1, &multiThread::FLthighCallback, this);
-        servo_sub[5] = nm.subscribe("/" + robot_name + "_gazebo/FL_calf_controller/state", 1, &multiThread::FLcalfCallback, this);
-        servo_sub[6] = nm.subscribe("/" + robot_name + "_gazebo/RR_hip_controller/state", 1, &multiThread::RRhipCallback, this);
-        servo_sub[7] = nm.subscribe("/" + robot_name + "_gazebo/RR_thigh_controller/state", 1, &multiThread::RRthighCallback, this);
-        servo_sub[8] = nm.subscribe("/" + robot_name + "_gazebo/RR_calf_controller/state", 1, &multiThread::RRcalfCallback, this);
-        servo_sub[9] = nm.subscribe("/" + robot_name + "_gazebo/RL_hip_controller/state", 1, &multiThread::RLhipCallback, this);
-        servo_sub[10] = nm.subscribe("/" + robot_name + "_gazebo/RL_thigh_controller/state", 1, &multiThread::RLthighCallback, this);
-        servo_sub[11] = nm.subscribe("/" + robot_name + "_gazebo/RL_calf_controller/state", 1, &multiThread::RLcalfCallback, this);
+        servo_sub[0] = nm.subscribe("/" + robot_name + "/FR_hip_controller/state", 1, &multiThread::FRhipCallback, this);
+        servo_sub[1] = nm.subscribe("/" + robot_name + "/FR_thigh_controller/state", 1, &multiThread::FRthighCallback, this);
+        servo_sub[2] = nm.subscribe("/" + robot_name + "/FR_calf_controller/state", 1, &multiThread::FRcalfCallback, this);
+        servo_sub[3] = nm.subscribe("/" + robot_name + "/FL_hip_controller/state", 1, &multiThread::FLhipCallback, this);
+        servo_sub[4] = nm.subscribe("/" + robot_name + "/FL_thigh_controller/state", 1, &multiThread::FLthighCallback, this);
+        servo_sub[5] = nm.subscribe("/" + robot_name + "/FL_calf_controller/state", 1, &multiThread::FLcalfCallback, this);
+        servo_sub[6] = nm.subscribe("/" + robot_name + "/RR_hip_controller/state", 1, &multiThread::RRhipCallback, this);
+        servo_sub[7] = nm.subscribe("/" + robot_name + "/RR_thigh_controller/state", 1, &multiThread::RRthighCallback, this);
+        servo_sub[8] = nm.subscribe("/" + robot_name + "/RR_calf_controller/state", 1, &multiThread::RRcalfCallback, this);
+        servo_sub[9] = nm.subscribe("/" + robot_name + "/RL_hip_controller/state", 1, &multiThread::RLhipCallback, this);
+        servo_sub[10] = nm.subscribe("/" + robot_name + "/RL_thigh_controller/state", 1, &multiThread::RLthighCallback, this);
+        servo_sub[11] = nm.subscribe("/" + robot_name + "/RL_calf_controller/state", 1, &multiThread::RLcalfCallback, this);
     }
 
     void imuCallback(const sensor_msgs::Imu & msg)
@@ -205,7 +205,7 @@ private:
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "unitree_gazebo_servo");
+    ros::init(argc, argv, "unitree/gazebo_servo");
 
     string robot_name;
     ros::param::get("/robot_name", robot_name);
@@ -220,19 +220,19 @@ int main(int argc, char **argv)
     ros::Publisher lowState_pub; //for rviz visualization
     // ros::Rate loop_rate(1000);
     // the following nodes have been initialized by "gazebo.launch"
-    lowState_pub = n.advertise<unitree_legged_msgs::LowState>("/" + robot_name + "_gazebo/lowState/state", 1);
-    servo_pub[0] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/FR_hip_controller/command", 1);
-    servo_pub[1] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/FR_thigh_controller/command", 1);
-    servo_pub[2] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/FR_calf_controller/command", 1);
-    servo_pub[3] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/FL_hip_controller/command", 1);
-    servo_pub[4] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/FL_thigh_controller/command", 1);
-    servo_pub[5] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/FL_calf_controller/command", 1);
-    servo_pub[6] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/RR_hip_controller/command", 1);
-    servo_pub[7] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/RR_thigh_controller/command", 1);
-    servo_pub[8] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/RR_calf_controller/command", 1);
-    servo_pub[9] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/RL_hip_controller/command", 1);
-    servo_pub[10] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/RL_thigh_controller/command", 1);
-    servo_pub[11] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "_gazebo/RL_calf_controller/command", 1);
+    lowState_pub = n.advertise<unitree_legged_msgs::LowState>("/" + robot_name + "/lowState/state", 1);
+    servo_pub[0] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/FR_hip_controller/command", 1);
+    servo_pub[1] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/FR_thigh_controller/command", 1);
+    servo_pub[2] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/FR_calf_controller/command", 1);
+    servo_pub[3] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/FL_hip_controller/command", 1);
+    servo_pub[4] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/FL_thigh_controller/command", 1);
+    servo_pub[5] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/FL_calf_controller/command", 1);
+    servo_pub[6] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/RR_hip_controller/command", 1);
+    servo_pub[7] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/RR_thigh_controller/command", 1);
+    servo_pub[8] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/RR_calf_controller/command", 1);
+    servo_pub[9] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/RL_hip_controller/command", 1);
+    servo_pub[10] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/RL_thigh_controller/command", 1);
+    servo_pub[11] = n.advertise<unitree_legged_msgs::MotorCmd>("/" + robot_name + "/RL_calf_controller/command", 1);
 
     motion_init();
 
