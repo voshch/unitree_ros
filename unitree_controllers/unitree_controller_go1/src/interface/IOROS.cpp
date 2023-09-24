@@ -38,6 +38,12 @@ IOROS::~IOROS(){
     ros::shutdown();
 }
 
+int IOROS::getTargetState(){
+    int state;
+    _nm.param<int>("target_state", state, -1);
+    return state;
+}
+
 void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
     sendCmd(cmd);
     recvState(state);
@@ -110,11 +116,9 @@ void IOROS::initRecv(bool blocking = false){
     _servo_sub[10] = _nm.subscribe(robot_namespace + "/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
     _servo_sub[11] = _nm.subscribe(robot_namespace + "/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
 
-    
-
     if(blocking){
 
-        ROS_WARN("waiting for IMU");
+        ROS_INFO("waiting for IMU");
         boost::shared_ptr<sensor_msgs::Imu const>  imu_msg;
         
         do{
@@ -122,7 +126,7 @@ void IOROS::initRecv(bool blocking = false){
         }
         while(!imu_msg || std::isnan(imu_msg->orientation.w) || imu_msg->orientation.w == 0);
 
-        ROS_WARN("valid IMU message received");
+        ROS_INFO("valid IMU message received");
     }
 }
 

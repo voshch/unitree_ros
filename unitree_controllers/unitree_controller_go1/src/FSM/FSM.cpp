@@ -18,10 +18,7 @@ FSM::FSM(CtrlComponents *ctrlComp)
 
     #ifdef COMPILE_WITH_MOVE_BASE
         _stateList.moveBase = new State_move_base(_ctrlComp);
-        _targetState = FSMStateName::MOVE_BASE;
     #endif  // COMPILE_WITH_MOVE_BASE
-
-    initialize();
     
 }
 
@@ -29,7 +26,10 @@ FSM::~FSM(){
     _stateList.deletePtr();
 }
 
-void FSM::initialize(){
+void FSM::initialize(FSMStateName target_state){
+    
+    _targetState = target_state;
+
     _currentState = _stateList.passive;
     _currentState -> enter();
     _nextState = _currentState;

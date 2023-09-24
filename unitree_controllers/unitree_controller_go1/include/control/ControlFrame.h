@@ -9,7 +9,7 @@
 
 class ControlFrame{
 public:
-	ControlFrame(CtrlComponents *ctrlComp);
+	ControlFrame(CtrlComponents *ctrlComp, int FSM_targetState = (int) FSMStateName::INVALID);
 	~ControlFrame(){
 		delete _FSMController;
 	}

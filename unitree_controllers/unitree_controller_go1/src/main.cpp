@@ -55,7 +55,8 @@ int main(int argc, char **argv)
     CtrlPlatform ctrlPlat;
 
 #ifdef COMPILE_WITH_SIMULATION
-    ioInter = new IOROS(true);
+    bool blocking = true; //set to true if simulation isn't valid immediately
+    ioInter = new IOROS(blocking);
     ctrlPlat = CtrlPlatform::GAZEBO;
 #endif // COMPILE_WITH_SIMULATION
 
@@ -84,7 +85,12 @@ int main(int argc, char **argv)
 
     ctrlComp->geneObj();
 
-    ControlFrame ctrlFrame(ctrlComp);
+    #ifdef COMPILE_WITH_SIMULATION
+        ControlFrame ctrlFrame(ctrlComp, ((IOROS*) ioInter)->getTargetState());
+    #else
+        ControlFrame ctrlFrame(ctrlComp);
+    #endif
+    
 
     signal(SIGINT, ShutDown);
 

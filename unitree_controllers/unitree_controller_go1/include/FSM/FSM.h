@@ -51,7 +51,7 @@ class FSM{
 public:
     FSM(CtrlComponents *ctrlComp);
     ~FSM();
-    void initialize();
+    void initialize(FSMStateName targetState);
     void run();
 private:
     FSMState* getNextState(FSMStateName stateName);

@@ -51,17 +51,17 @@ enum class FSMMode{
 
 enum class FSMStateName{
     // EXIT,
-    INVALID,
-    PASSIVE,
-    FIXEDSTAND,
-    FREESTAND,
-    TROTTING,
+    INVALID = -1,
+    PASSIVE = 1,
+    FIXEDSTAND = 2,
+    FREESTAND = 3,
+    TROTTING = 4,
 #ifdef COMPILE_WITH_MOVE_BASE
-    MOVE_BASE,       // move_base
+    MOVE_BASE = 5,       // move_base
 #endif  // COMPILE_WITH_MOVE_BASE
-    BALANCETEST,
-    SWINGTEST,
-    STEPTEST
+    BALANCETEST = 7,
+    SWINGTEST = 8,
+    STEPTEST = 9
 };
 
 #endif  // ENUMCLASS_H

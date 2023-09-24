@@ -21,6 +21,7 @@ public:
 IOROS(bool blocking = false);
 ~IOROS();
 void sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
+int getTargetState();
 
 private:
 void sendCmd(const LowlevelCmd *cmd);
@@ -32,7 +33,6 @@ unitree_legged_msgs::LowCmd _lowCmd;
 unitree_legged_msgs::LowState _lowState;
 
 std::string robot_namespace;
-
 
 //repeated functions for multi-thread
 void initRecv(bool blocking);
