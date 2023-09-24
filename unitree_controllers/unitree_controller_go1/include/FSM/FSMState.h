@@ -24,6 +24,11 @@ public:
     virtual void run() = 0;
     virtual void exit() = 0;
     virtual FSMStateName checkChange() {return FSMStateName::INVALID;}
+    virtual FSMStateName checkChangeOverride(FSMStateName target_state) {
+        if(false && target_state != FSMStateName::INVALID)
+            return target_state;
+        return checkChange();
+    }
 
     FSMStateName _stateName;
     std::string _stateNameString;

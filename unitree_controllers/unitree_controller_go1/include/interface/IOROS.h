@@ -1,6 +1,7 @@
 /**********************************************************************
  Copyright (c) 2020-2023, Unitree Robotics.Co.Ltd. All rights reserved.
 ***********************************************************************/
+
 #ifdef COMPILE_WITH_ROS
 
 #ifndef IOROS_H
@@ -17,7 +18,7 @@
 
 class IOROS : public IOInterface{
 public:
-IOROS();
+IOROS(bool blocking = false);
 ~IOROS();
 void sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
 
@@ -32,8 +33,9 @@ unitree_legged_msgs::LowState _lowState;
 
 std::string robot_namespace;
 
+
 //repeated functions for multi-thread
-void initRecv();
+void initRecv(bool blocking);
 void initSend();
 
 //Callback functions for ROS

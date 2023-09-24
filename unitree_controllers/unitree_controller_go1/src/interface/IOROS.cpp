@@ -1,6 +1,7 @@
 /**********************************************************************
  Copyright (c) 2020-2023, Unitree Robotics.Co.Ltd. All rights reserved.
 ***********************************************************************/
+
 #ifdef COMPILE_WITH_ROS
 
 #include "interface/IOROS.h"
@@ -14,13 +15,13 @@ void RosShutDown(int sig){
 	ros::shutdown();
 }
 
-IOROS::IOROS():IOInterface(){
+IOROS::IOROS(bool blocking):IOInterface(){
 
     ROS_INFO("The control interface for ROS Gazebo simulation");
     _nm.param<std::string>("robot_namespace", robot_namespace, "/UNKNOWN_NAMESPACE");
 
     // start subscriber
-    initRecv();
+    initRecv(blocking);
     ros::AsyncSpinner subSpinner(1); // one threads
     subSpinner.start();
     usleep(300000);     //wait for subscribers start
@@ -91,7 +92,7 @@ void IOROS::initSend(){
     _servo_pub[11] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace + "/RL_calf_controller/command", 1);
 }
 
-void IOROS::initRecv(){
+void IOROS::initRecv(bool blocking = false){
     std::string trunk_topic = robot_namespace + "/trunk_imu";
     ROS_INFO("subscribing %s", trunk_topic.c_str());
     _imu_sub = _nm.subscribe(trunk_topic, 1, &IOROS::imuCallback, this);
@@ -108,6 +109,21 @@ void IOROS::initRecv(){
     _servo_sub[9] = _nm.subscribe(robot_namespace +  "/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
     _servo_sub[10] = _nm.subscribe(robot_namespace + "/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
     _servo_sub[11] = _nm.subscribe(robot_namespace + "/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
+
+    
+
+    if(blocking){
+
+        ROS_WARN("waiting for IMU");
+        boost::shared_ptr<sensor_msgs::Imu const>  imu_msg;
+        
+        do{
+            imu_msg = ros::topic::waitForMessage<sensor_msgs::Imu>(_imu_sub.getTopic(), _nm);
+        }
+        while(!imu_msg || std::isnan(imu_msg->orientation.w) || imu_msg->orientation.w == 0);
+
+        ROS_WARN("valid IMU message received");
+    }
 }
 
 void IOROS::imuCallback(const sensor_msgs::Imu & msg)

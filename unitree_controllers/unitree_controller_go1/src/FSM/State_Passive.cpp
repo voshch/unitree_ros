@@ -44,6 +44,9 @@ FSMStateName State_Passive::checkChange(){
         return FSMStateName::FIXEDSTAND;
     }
     else{
+        #ifdef COMPILE_WITH_MOVE_BASE
+            return FSMStateName::MOVE_BASE;
+        #endif
         return FSMStateName::PASSIVE;
     }
 }

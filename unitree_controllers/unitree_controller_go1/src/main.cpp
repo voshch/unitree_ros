@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     CtrlPlatform ctrlPlat;
 
 #ifdef COMPILE_WITH_SIMULATION
-    ioInter = new IOROS();
+    ioInter = new IOROS(true);
     ctrlPlat = CtrlPlatform::GAZEBO;
 #endif // COMPILE_WITH_SIMULATION
 

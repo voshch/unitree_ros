@@ -51,8 +51,7 @@ class FSM{
 public:
     FSM(CtrlComponents *ctrlComp);
     ~FSM();
-    void initialize(FSMState* init_state);
-    void initialize() { initialize( _stateList.passive ); };
+    void initialize();
     void run();
 private:
     FSMState* getNextState(FSMStateName stateName);
@@ -60,6 +59,7 @@ private:
     CtrlComponents *_ctrlComp;
     FSMState *_currentState;
     FSMState *_nextState;
+    FSMStateName _targetState = FSMStateName::INVALID;
     FSMStateName _nextStateName;
     FSMStateList _stateList;
     FSMMode _mode;

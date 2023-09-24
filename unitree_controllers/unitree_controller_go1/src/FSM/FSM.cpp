@@ -16,20 +16,21 @@ FSM::FSM(CtrlComponents *ctrlComp)
     _stateList.swingTest = new State_SwingTest(_ctrlComp);
     _stateList.stepTest = new State_StepTest(_ctrlComp);
 
-    initialize();
-
     #ifdef COMPILE_WITH_MOVE_BASE
         _stateList.moveBase = new State_move_base(_ctrlComp);
-        initialize(_stateList.moveBase);
+        _targetState = FSMStateName::MOVE_BASE;
     #endif  // COMPILE_WITH_MOVE_BASE
+
+    initialize();
+    
 }
 
 FSM::~FSM(){
     _stateList.deletePtr();
 }
 
-void FSM::initialize(FSMState* init_state){
-    _currentState = init_state;
+void FSM::initialize(){
+    _currentState = _stateList.passive;
     _currentState -> enter();
     _nextState = _currentState;
     _mode = FSMMode::NORMAL;
@@ -46,7 +47,7 @@ void FSM::run(){
 
     if(_mode == FSMMode::NORMAL){
         _currentState->run();
-        _nextStateName = _currentState->checkChange();
+        _nextStateName = _currentState->checkChangeOverride(_targetState);
         if(_nextStateName != _currentState->_stateName){
             _mode = FSMMode::CHANGE;
             _nextState = getNextState(_nextStateName);
