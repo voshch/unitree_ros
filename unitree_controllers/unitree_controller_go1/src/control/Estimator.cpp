@@ -118,6 +118,7 @@ void Estimator::_initSystem(){
     /* ROS odometry publisher */
     #ifdef COMPILE_WITH_MOVE_BASE
         std::string robot_namespace;
+        _nh = ros::NodeHandle("~");
         _nh.param<std::string>("robot_namespace", robot_namespace);
         _pub = _nh.advertise<nav_msgs::Odometry>(robot_namespace + "/odom", 1);
     #endif  // COMPILE_WITH_MOVE_BASE

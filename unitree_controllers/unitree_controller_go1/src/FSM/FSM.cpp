@@ -51,8 +51,7 @@ void FSM::run(){
         if(_nextStateName != _currentState->_stateName){
             _mode = FSMMode::CHANGE;
             _nextState = getNextState(_nextStateName);
-            std::cout << "Switched from " << _currentState->_stateNameString
-                      << " to " << _nextState->_stateNameString << std::endl;
+            // std::cout << "Switched from " << _currentState->_stateNameString << " to " << _nextState->_stateNameString << std::endl;
         }
     }
     else if(_mode == FSMMode::CHANGE){

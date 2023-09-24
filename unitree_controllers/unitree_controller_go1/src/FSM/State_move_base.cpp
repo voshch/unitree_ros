@@ -37,6 +37,7 @@ void State_move_base::twistCallback(const geometry_msgs::Twist& msg){
 
 void State_move_base::initRecv(){
     std::string robot_namespace;
+    _nm = ros::NodeHandle("~");
     _nm.param<std::string>("robot_namespace", robot_namespace);
     _cmdSub = _nm.subscribe(robot_namespace + "/cmd_vel", 1, &State_move_base::twistCallback, this);
 }

@@ -17,6 +17,8 @@ void RosShutDown(int sig){
 
 IOROS::IOROS(bool blocking):IOInterface(){
 
+    _nm = ros::NodeHandle("~");
+
     ROS_INFO("The control interface for ROS Gazebo simulation");
     _nm.param<std::string>("robot_namespace", robot_namespace, "/UNKNOWN_NAMESPACE");
 
