@@ -64,7 +64,15 @@ void IOROS::sendCmd(const LowlevelCmd *lowCmd){
         _lowCmd.motorCmd[i].Kp = lowCmd->motorCmd[i].Kp;
     }
     for(int m(0); m < 12; ++m){
-        _servo_pub[m].publish(_lowCmd.motorCmd[m]);
+        if(!(
+            std::isnan(_lowCmd.motorCmd[m].q)   ||
+            std::isnan(_lowCmd.motorCmd[m].dq)  ||
+            std::isnan(_lowCmd.motorCmd[m].tau) ||
+            std::isnan(_lowCmd.motorCmd[m].Kd)  ||
+            std::isnan(_lowCmd.motorCmd[m].Kp) 
+        )){
+            _servo_pub[m].publish(_lowCmd.motorCmd[m]);
+        }
     }
     ros::spinOnce();
 }

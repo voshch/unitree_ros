@@ -48,7 +48,7 @@ public:
 #endif  // COMPILE_WITH_REAL_ROBOT
 protected:
     virtual void* run(void *arg){return NULL;}
-    UserCommand userCmd;
+    UserCommand userCmd = UserCommand::NONE;
     UserValue userValue;
 };
 

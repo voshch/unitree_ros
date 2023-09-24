@@ -25,7 +25,7 @@ IOSDK::IOSDK():_safe(UNITREE_LEGGED_SDK::LeggedType::Aliengo), _udp(UNITREE_LEGG
 
 #ifdef ROBOT_TYPE_A1
 IOSDK::IOSDK():_safe(UNITREE_LEGGED_SDK::LeggedType::Aliengo), _udp(UNITREE_LEGGED_SDK::LOWLEVEL){
-    ROS_INFO("The control interface for real robot");
+    std::cout << "The control interface for real robot" << std::endl;
     _udp.InitCmdData(_lowCmd);
     cmdPanel = new WirelessHandle();
 

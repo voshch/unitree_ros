@@ -15,6 +15,11 @@ public:
     void exit();
     FSMStateName checkChange();
 
+protected:
+    virtual bool isReached(){
+        return _percent == 1.f;
+    }
+
 private:
     float _targetPos[12] = {0.0, 0.67, -1.3, 0.0, 0.67, -1.3, 
                             0.0, 0.67, -1.3, 0.0, 0.67, -1.3};

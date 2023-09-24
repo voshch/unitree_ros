@@ -24,10 +24,15 @@ public:
     virtual void run() = 0;
     virtual void exit() = 0;
     virtual FSMStateName checkChange() {return FSMStateName::INVALID;}
-    virtual FSMStateName checkChangeOverride(FSMStateName target_state) {
-        if(false && target_state != FSMStateName::INVALID)
-            return target_state;
-        return checkChange();
+    FSMStateName checkChangeOverride(FSMStateName targetState) {
+
+        if(_stateName == targetState)
+            return targetState;
+
+        if(_stateName == FSMStateName::FIXEDSTAND && isReached())
+            return targetState;
+        
+        return FSMStateName::FIXEDSTAND;
     }
 
     FSMStateName _stateName;
@@ -39,6 +44,8 @@ protected:
     LowlevelCmd *_lowCmd;
     LowlevelState *_lowState;
     UserValue _userValue;
+
+    virtual bool isReached(){return false;}
 };
 
 #endif  // FSMSTATE_H

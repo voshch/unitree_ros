@@ -5,6 +5,10 @@
 #include "common/mathTools.h"
 #include "common/enumClass.h"
 
+#ifdef COMPILE_WITH_SIMULATION
+    #include "ros/ros.h"
+#endif
+
 Estimator::Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState, 
                      VecInt4 *contact, Vec4 *phase, double dt, Vec18 Qdig,
                      std::string testName)
@@ -121,6 +125,11 @@ void Estimator::_initSystem(){
         _nh = ros::NodeHandle("~");
         _nh.param<std::string>("robot_namespace", robot_namespace);
         _pub = _nh.advertise<nav_msgs::Odometry>(robot_namespace + "/odom", 1);
+
+        #ifdef COMPILE_WITH_SIMULATION
+            ROS_INFO("advertising %s/odom", robot_namespace.c_str());
+        #endif
+
     #endif  // COMPILE_WITH_MOVE_BASE
 }
 
@@ -186,6 +195,9 @@ void Estimator::run(){
             _odomTF.transform.rotation.x = _lowState->imu.quaternion[1];
             _odomTF.transform.rotation.y = _lowState->imu.quaternion[2];
             _odomTF.transform.rotation.z = _lowState->imu.quaternion[3];
+            
+            //if(_lowState->imu.quaternion[0] != 0 && !std::isnan(_xhat(2)) )
+                _odomBroadcaster.sendTransform(_odomTF);
 
             /* odometry */
             _odomMsg.header.stamp = _currentTime;
@@ -212,10 +224,9 @@ void Estimator::run(){
             _odomMsg.twist.twist.angular.z = _wBody(2);
             _odomMsg.twist.covariance = _odom_twist_covariance;
 
-            if( _lowState->imu.quaternion[0] != 0 && !std::isnan(_xhat(2)) ){
-                _odomBroadcaster.sendTransform(_odomTF);
+            //if(_lowState->imu.quaternion[0] != 0 && !std::isnan(_xhat(2)) )
                 _pub.publish(_odomMsg);
-            }
+
             _count = 1;
         }
         ++_count;

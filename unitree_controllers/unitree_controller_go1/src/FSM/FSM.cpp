@@ -26,9 +26,9 @@ FSM::~FSM(){
     _stateList.deletePtr();
 }
 
-void FSM::initialize(FSMStateName target_state){
+void FSM::initialize(FSMStateName targetState){
     
-    _targetState = target_state;
+    _targetState = targetState;
 
     _currentState = _stateList.passive;
     _currentState -> enter();
@@ -42,7 +42,9 @@ void FSM::run(){
     _ctrlComp->runWaveGen();
     _ctrlComp->estimator->run();
     if(!checkSafty()){
-        _ctrlComp->ioInter->setPassive();
+        // _ctrlComp->ioInter->setPassive(); nice safety
+        _nextState = _stateList.passive;
+        _mode = FSMMode::CHANGE;
     }
 
     if(_mode == FSMMode::NORMAL){
@@ -51,11 +53,13 @@ void FSM::run(){
         if(_nextStateName != _currentState->_stateName){
             _mode = FSMMode::CHANGE;
             _nextState = getNextState(_nextStateName);
-            // std::cout << "Switched from " << _currentState->_stateNameString << " to " << _nextState->_stateNameString << std::endl;
         }
     }
     else if(_mode == FSMMode::CHANGE){
-        _currentState->exit();
+        if(_nextState->_stateName != _currentState->_stateName){
+            // std::cout << "Switched from " << _currentState->_stateNameString << " to " << _nextState->_stateNameString << std::endl;
+            _currentState->exit();
+        }
         _currentState = _nextState;
         _currentState->enter();
         _mode = FSMMode::NORMAL;

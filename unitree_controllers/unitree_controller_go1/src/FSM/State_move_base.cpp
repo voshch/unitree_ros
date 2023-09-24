@@ -5,6 +5,10 @@
 
 #include "FSM/State_move_base.h"
 
+#ifdef COMPILE_WITH_SIMULATION
+    #include "ros/ros.h"
+#endif
+
 State_move_base::State_move_base(CtrlComponents *ctrlComp)
     :State_Trotting(ctrlComp){
     _stateName = FSMStateName::MOVE_BASE;
@@ -40,6 +44,10 @@ void State_move_base::initRecv(){
     _nm = ros::NodeHandle("~");
     _nm.param<std::string>("robot_namespace", robot_namespace);
     _cmdSub = _nm.subscribe(robot_namespace + "/cmd_vel", 1, &State_move_base::twistCallback, this);
+
+    #ifdef COMPILE_WITH_SIMULATION
+        ROS_INFO("subscribing %s/cmd_vel", robot_namespace.c_str());
+    #endif
 }
 
 #endif  // COMPILE_WITH_MOVE_BASE
