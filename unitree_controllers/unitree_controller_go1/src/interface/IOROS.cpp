@@ -20,7 +20,10 @@ IOROS::IOROS(bool blocking):IOInterface(){
     _nm = ros::NodeHandle("~");
 
     ROS_INFO("The control interface for ROS Gazebo simulation");
-    _nm.param<std::string>("robot_namespace", robot_namespace, "/UNKNOWN_NAMESPACE");
+    
+    params = new ROSParams();
+    _nm.param<std::string>("robot_namespace", params->robotNamespace, "/UNKNOWN_NAMESPACE");
+    _nm.param<int>("target_state", params->targetState, -1);
 
     // start subscriber
     initRecv(blocking);
@@ -37,13 +40,8 @@ IOROS::IOROS(bool blocking):IOInterface(){
 
 IOROS::~IOROS(){
     delete cmdPanel;
+    delete params;
     ros::shutdown();
-}
-
-int IOROS::getTargetState(){
-    int state;
-    _nm.param<int>("target_state", state, -1);
-    return state;
 }
 
 void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
@@ -93,38 +91,38 @@ void IOROS::recvState(LowlevelState *state){
 }
 
 void IOROS::initSend(){
-    ROS_INFO("advertising %s/XX_YY_controller/command", robot_namespace.c_str());
-    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/FR_hip_controller/command", 1);
-    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/FR_thigh_controller/command", 1);
-    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/FR_calf_controller/command", 1);
-    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/FL_hip_controller/command", 1);
-    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/FL_thigh_controller/command", 1);
-    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/FL_calf_controller/command", 1);
-    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/RR_hip_controller/command", 1);
-    _servo_pub[7] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/RR_thigh_controller/command", 1);
-    _servo_pub[8] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/RR_calf_controller/command", 1);
-    _servo_pub[9] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace +  "/RL_hip_controller/command", 1);
-    _servo_pub[10] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace + "/RL_thigh_controller/command", 1);
-    _servo_pub[11] = _nm.advertise<unitree_legged_msgs::MotorCmd>(robot_namespace + "/RL_calf_controller/command", 1);
+    ROS_INFO("advertising %s/XX_YY_controller/command", params->robotNamespace.c_str());
+    _servo_pub[0] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/FR_hip_controller/command", 1);
+    _servo_pub[1] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/FR_thigh_controller/command", 1);
+    _servo_pub[2] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/FR_calf_controller/command", 1);
+    _servo_pub[3] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/FL_hip_controller/command", 1);
+    _servo_pub[4] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/FL_thigh_controller/command", 1);
+    _servo_pub[5] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/FL_calf_controller/command", 1);
+    _servo_pub[6] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/RR_hip_controller/command", 1);
+    _servo_pub[7] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/RR_thigh_controller/command", 1);
+    _servo_pub[8] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/RR_calf_controller/command", 1);
+    _servo_pub[9] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace +  "/RL_hip_controller/command", 1);
+    _servo_pub[10] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace + "/RL_thigh_controller/command", 1);
+    _servo_pub[11] = _nm.advertise<unitree_legged_msgs::MotorCmd>(params->robotNamespace + "/RL_calf_controller/command", 1);
 }
 
 void IOROS::initRecv(bool blocking = false){
-    std::string trunk_topic = robot_namespace + "/trunk_imu";
+    std::string trunk_topic = params->robotNamespace + "/trunk_imu";
     ROS_INFO("subscribing %s", trunk_topic.c_str());
     _imu_sub = _nm.subscribe(trunk_topic, 1, &IOROS::imuCallback, this);
-    ROS_INFO("subscribing %s/XX_YY_controller/state", robot_namespace.c_str());
-    _servo_sub[0] = _nm.subscribe(robot_namespace +  "/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
-    _servo_sub[1] = _nm.subscribe(robot_namespace +  "/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
-    _servo_sub[2] = _nm.subscribe(robot_namespace +  "/FR_calf_controller/state", 1, &IOROS::FRcalfCallback, this);
-    _servo_sub[3] = _nm.subscribe(robot_namespace +  "/FL_hip_controller/state", 1, &IOROS::FLhipCallback, this);
-    _servo_sub[4] = _nm.subscribe(robot_namespace +  "/FL_thigh_controller/state", 1, &IOROS::FLthighCallback, this);
-    _servo_sub[5] = _nm.subscribe(robot_namespace +  "/FL_calf_controller/state", 1, &IOROS::FLcalfCallback, this);
-    _servo_sub[6] = _nm.subscribe(robot_namespace +  "/RR_hip_controller/state", 1, &IOROS::RRhipCallback, this);
-    _servo_sub[7] = _nm.subscribe(robot_namespace +  "/RR_thigh_controller/state", 1, &IOROS::RRthighCallback, this);
-    _servo_sub[8] = _nm.subscribe(robot_namespace +  "/RR_calf_controller/state", 1, &IOROS::RRcalfCallback, this);
-    _servo_sub[9] = _nm.subscribe(robot_namespace +  "/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
-    _servo_sub[10] = _nm.subscribe(robot_namespace + "/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
-    _servo_sub[11] = _nm.subscribe(robot_namespace + "/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
+    ROS_INFO("subscribing %s/XX_YY_controller/state", params->robotNamespace.c_str());
+    _servo_sub[0] = _nm.subscribe(params->robotNamespace +  "/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
+    _servo_sub[1] = _nm.subscribe(params->robotNamespace +  "/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
+    _servo_sub[2] = _nm.subscribe(params->robotNamespace +  "/FR_calf_controller/state", 1, &IOROS::FRcalfCallback, this);
+    _servo_sub[3] = _nm.subscribe(params->robotNamespace +  "/FL_hip_controller/state", 1, &IOROS::FLhipCallback, this);
+    _servo_sub[4] = _nm.subscribe(params->robotNamespace +  "/FL_thigh_controller/state", 1, &IOROS::FLthighCallback, this);
+    _servo_sub[5] = _nm.subscribe(params->robotNamespace +  "/FL_calf_controller/state", 1, &IOROS::FLcalfCallback, this);
+    _servo_sub[6] = _nm.subscribe(params->robotNamespace +  "/RR_hip_controller/state", 1, &IOROS::RRhipCallback, this);
+    _servo_sub[7] = _nm.subscribe(params->robotNamespace +  "/RR_thigh_controller/state", 1, &IOROS::RRthighCallback, this);
+    _servo_sub[8] = _nm.subscribe(params->robotNamespace +  "/RR_calf_controller/state", 1, &IOROS::RRcalfCallback, this);
+    _servo_sub[9] = _nm.subscribe(params->robotNamespace +  "/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
+    _servo_sub[10] = _nm.subscribe(params->robotNamespace + "/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
+    _servo_sub[11] = _nm.subscribe(params->robotNamespace + "/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
 
     if(blocking){
 

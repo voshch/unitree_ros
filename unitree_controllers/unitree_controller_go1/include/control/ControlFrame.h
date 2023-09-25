@@ -6,10 +6,11 @@
 
 #include "FSM/FSM.h"
 #include "control/CtrlComponents.h"
+#include "interface/ROSParams.h"
 
 class ControlFrame{
 public:
-	ControlFrame(CtrlComponents *ctrlComp, int FSM_targetState = (int) FSMStateName::INVALID);
+	ControlFrame(CtrlComponents *ctrlComp);
 	~ControlFrame(){
 		delete _FSMController;
 	}

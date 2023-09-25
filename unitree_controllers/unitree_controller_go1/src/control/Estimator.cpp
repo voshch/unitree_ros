@@ -19,7 +19,7 @@ Estimator::Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState,
 }
 
 Estimator::Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState, 
-                     VecInt4 *contact, Vec4 *phase, double dt)
+                     VecInt4 *contact, Vec4 *phase, double dt, std::string robotNamespace)
           :_robModel(robotModel), _lowState(lowState), _contact(contact), 
            _phase(phase), _dt(dt){
 
@@ -36,6 +36,10 @@ Estimator::Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState,
     }
 
     _estName = "current";
+
+    #ifdef COMPILE_WITH_MOVE_BASE
+        _robotNamespace = robotNamespace;
+    #endif
 
     _initSystem();
 
@@ -121,13 +125,10 @@ void Estimator::_initSystem(){
 
     /* ROS odometry publisher */
     #ifdef COMPILE_WITH_MOVE_BASE
-        std::string robot_namespace;
-        _nh = ros::NodeHandle("~");
-        _nh.param<std::string>("robot_namespace", robot_namespace);
-        _pub = _nh.advertise<nav_msgs::Odometry>(robot_namespace + "/odom", 1);
+        _pub = _nh.advertise<nav_msgs::Odometry>(_robotNamespace + "/odom", 1);
 
         #ifdef COMPILE_WITH_SIMULATION
-            ROS_INFO("advertising %s/odom", robot_namespace.c_str());
+            ROS_INFO("advertising %s/odom", _robotNamespace.c_str());
         #endif
 
     #endif  // COMPILE_WITH_MOVE_BASE

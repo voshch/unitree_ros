@@ -26,6 +26,9 @@ public:
     virtual FSMStateName checkChange() {return FSMStateName::INVALID;}
     FSMStateName checkChangeOverride(FSMStateName targetState) {
 
+        if(targetState == FSMStateName::INVALID)
+            return checkChange();
+
         if(_stateName == targetState)
             return targetState;
 

@@ -51,15 +51,15 @@ class FSM{
 public:
     FSM(CtrlComponents *ctrlComp);
     ~FSM();
-    void initialize(FSMStateName targetState = FSMStateName::PASSIVE);
     void run();
 private:
+    void initialize();
     FSMState* getNextState(FSMStateName stateName);
     bool checkSafty();
     CtrlComponents *_ctrlComp;
     FSMState *_currentState;
     FSMState *_nextState;
-    FSMStateName _targetState;
+    FSMStateName _targetState = FSMStateName::INVALID;
     FSMStateName _nextStateName;
     FSMStateList _stateList;
     FSMMode _mode;

@@ -65,7 +65,12 @@ int main(int argc, char **argv)
     ctrlPlat = CtrlPlatform::REALROBOT;
 #endif // COMPILE_WITH_REAL_ROBOT
 
-    CtrlComponents *ctrlComp = new CtrlComponents(ioInter);
+    #ifdef COMPILE_WITH_SIMULATION
+        CtrlComponents *ctrlComp = new CtrlComponents(ioInter, ((IOROS*) ioInter)->params);
+    #else
+        CtrlComponents *ctrlComp = new CtrlComponents(ioInter);
+    #endif
+
     ctrlComp->ctrlPlatform = ctrlPlat;
     ctrlComp->dt = 0.002; // run at 500hz
     ctrlComp->running = &running;
@@ -84,12 +89,8 @@ int main(int argc, char **argv)
     // ctrlComp->waveGen = new WaveGenerator(0.4, 0.7, Vec4(0, 0, 0, 0));  //Pronk, only for sim
 
     ctrlComp->geneObj();
-
-    #ifdef COMPILE_WITH_SIMULATION
-        ControlFrame ctrlFrame(ctrlComp, ((IOROS*) ioInter)->getTargetState());
-    #else
-        ControlFrame ctrlFrame(ctrlComp);
-    #endif
+    
+    ControlFrame ctrlFrame(ctrlComp);
     
 
     signal(SIGINT, ShutDown);

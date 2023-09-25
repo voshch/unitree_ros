@@ -3,9 +3,8 @@
 ***********************************************************************/
 #include "control/ControlFrame.h"
 
-ControlFrame::ControlFrame(CtrlComponents *ctrlComp, int FSM_targetState):_ctrlComp(ctrlComp){
+ControlFrame::ControlFrame(CtrlComponents *ctrlComp):_ctrlComp(ctrlComp){
     _FSMController = new FSM(_ctrlComp);
-    _FSMController->initialize((FSMStateName) FSM_targetState);
 }
 
 void ControlFrame::run(){

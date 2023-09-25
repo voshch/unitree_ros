@@ -27,7 +27,7 @@
 
 class Estimator{
 public:
-    Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState, VecInt4 *contact, Vec4 *phase, double dt);
+    Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState, VecInt4 *contact, Vec4 *phase, double dt, std::string robotNamespace = "");
     Estimator(QuadrupedRobot *robotModel, LowlevelState* lowState, VecInt4 *contact, Vec4 *phase, double dt, Vec18 Qdig, std::string testName);
     ~Estimator();
     Vec3  getPosition();
@@ -96,8 +96,9 @@ private:
 #ifdef COMPILE_DEBUG
     PyPlot *_testPlot;
 #endif  // COMPILE_DEBUG
-#ifdef COMPILE_WITH_MOVE_BASE
+#ifdef COMPILE_WITH_ROS
     ros::NodeHandle _nh;
+    std::string _robotNamespace;
     ros::Publisher _pub;
     tf::TransformBroadcaster _odomBroadcaster;
     ros::Time _currentTime;

@@ -23,6 +23,7 @@ private:
     ros::Subscriber _cmdSub;
     double _vx, _vy;
     double _wz;
+    std::string robotNamespace = "";
 };
 
 #endif  // STATE_MOVE_BASE_H

@@ -14,6 +14,7 @@
 #include "control/BalanceCtrl.h"
 #include <string>
 #include <iostream>
+#include "interface/ROSParams.h"
 
 #ifdef COMPILE_DEBUG
 #include "common/PyPlot.h"
@@ -21,13 +22,14 @@
 
 struct CtrlComponents{
 public:
-    CtrlComponents(IOInterface *ioInter):ioInter(ioInter){
+    CtrlComponents(IOInterface *ioInter, ROSParams* paramsPtr = nullptr):ioInter(ioInter){
         lowCmd = new LowlevelCmd();
         lowState = new LowlevelState();
         contact = new VecInt4;
         phase = new Vec4;
         *contact = VecInt4(0, 0, 0, 0);
         *phase = Vec4(0.5, 0.5, 0.5, 0.5);
+        params = paramsPtr;
     }
     ~CtrlComponents(){
         delete lowCmd;
@@ -48,6 +50,7 @@ public:
     WaveGenerator *waveGen;
     Estimator *estimator;
     BalanceCtrl *balCtrl;
+    ROSParams* params;
 
 #ifdef COMPILE_DEBUG
     PyPlot *plot;
@@ -81,7 +84,12 @@ public:
     }
 
     void geneObj(){
-        estimator = new Estimator(robotModel, lowState, contact, phase, dt);
+        if(params){
+            estimator = new Estimator(robotModel, lowState, contact, phase, dt, params->robotNamespace);
+        }
+        else{
+            estimator = new Estimator(robotModel, lowState, contact, phase, dt);
+        }
         balCtrl = new BalanceCtrl(robotModel);
 
 #ifdef COMPILE_DEBUG
