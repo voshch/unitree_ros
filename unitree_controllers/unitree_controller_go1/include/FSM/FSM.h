@@ -13,13 +13,15 @@
 #include "FSM/State_BalanceTest.h"
 #include "FSM/State_SwingTest.h"
 #include "FSM/State_StepTest.h"
+#include "FSM/State_Danger.h"
 #include "common/enumClass.h"
 #include "control/CtrlComponents.h"
 #ifdef COMPILE_WITH_MOVE_BASE
-    #include "FSM/State_move_base.h"
-#endif  // COMPILE_WITH_MOVE_BASE
+#include "FSM/State_move_base.h"
+#endif // COMPILE_WITH_MOVE_BASE
 
-struct FSMStateList{
+struct FSMStateList
+{
     FSMState *invalid;
     State_Passive *passive;
     State_FixedStand *fixedStand;
@@ -28,11 +30,13 @@ struct FSMStateList{
     State_BalanceTest *balanceTest;
     State_SwingTest *swingTest;
     State_StepTest *stepTest;
+    State_Danger *danger;
 #ifdef COMPILE_WITH_MOVE_BASE
     State_move_base *moveBase;
-#endif  // COMPILE_WITH_MOVE_BASE
+#endif // COMPILE_WITH_MOVE_BASE
 
-    void deletePtr(){
+    void deletePtr()
+    {
         delete invalid;
         delete passive;
         delete fixedStand;
@@ -43,18 +47,20 @@ struct FSMStateList{
         delete stepTest;
 #ifdef COMPILE_WITH_MOVE_BASE
         delete moveBase;
-#endif  // COMPILE_WITH_MOVE_BASE
+#endif // COMPILE_WITH_MOVE_BASE
     }
 };
 
-class FSM{
+class FSM
+{
 public:
     FSM(CtrlComponents *ctrlComp);
     ~FSM();
     void run();
+
 private:
     void initialize();
-    FSMState* getNextState(FSMStateName stateName);
+    FSMState *getNextState(FSMStateName stateName);
     bool checkSafty();
     CtrlComponents *_ctrlComp;
     FSMState *_currentState;
@@ -64,8 +70,8 @@ private:
     FSMStateList _stateList;
     FSMMode _mode;
     long long _startTime;
+    long long _safetyTimeout = 0ll;
     int count;
 };
 
-
-#endif  // FSM_H
+#endif // FSM_H

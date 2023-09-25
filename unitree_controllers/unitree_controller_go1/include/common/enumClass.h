@@ -61,7 +61,8 @@ enum class FSMStateName{
 #endif  // COMPILE_WITH_MOVE_BASE
     BALANCETEST = 7,
     SWINGTEST = 8,
-    STEPTEST = 9
+    STEPTEST = 9,
+    DANGER = 10
 };
 
 #endif  // ENUMCLASS_H

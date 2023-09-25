@@ -19,6 +19,8 @@ FSM::FSM(CtrlComponents *ctrlComp)
     _stateList.balanceTest = new State_BalanceTest(_ctrlComp);
     _stateList.swingTest = new State_SwingTest(_ctrlComp);
     _stateList.stepTest = new State_StepTest(_ctrlComp);
+    _stateList.danger = new State_Danger(_ctrlComp);
+    
 
     #ifdef COMPILE_WITH_MOVE_BASE
         _stateList.moveBase = new State_move_base(_ctrlComp);
@@ -47,7 +49,7 @@ void FSM::run(){
     _ctrlComp->estimator->run();
     if(!checkSafty()){
         // _ctrlComp->ioInter->setPassive(); nice safety
-        _nextState = _stateList.passive;
+        _nextState = _stateList.danger;
         _mode = FSMMode::CHANGE;
     }
 
@@ -61,7 +63,7 @@ void FSM::run(){
     }
     else if(_mode == FSMMode::CHANGE){
         if(_nextState->_stateName != _currentState->_stateName){
-            // std::cout << "Switched from " << _currentState->_stateNameString << " to " << _nextState->_stateNameString << std::endl;
+            std::cout << "Switched from " << _currentState->_stateNameString << " to " << _nextState->_stateNameString << std::endl;
             _currentState->exit();
         }
         _currentState = _nextState;
@@ -100,6 +102,9 @@ FSMState* FSM::getNextState(FSMStateName stateName){
     case FSMStateName::STEPTEST:
         return _stateList.stepTest;
         break;
+    case FSMStateName::DANGER:
+        return _stateList.danger;
+        break;
 #ifdef COMPILE_WITH_MOVE_BASE
     case FSMStateName::MOVE_BASE:
         return _stateList.moveBase;
@@ -112,10 +117,19 @@ FSMState* FSM::getNextState(FSMStateName stateName){
 }
 
 bool FSM::checkSafty(){
+    
     // The angle with z axis less than 60 degree
     if(_ctrlComp->lowState->getRotMat()(2,2) < 0.5 ){
+        _safetyTimeout = getSystemTime() + 1e6; // 1s  
+        //std::cout << "active danger" << std::endl;
         return false;
-    }else{
+    }
+    //keep waiting
+    else if(getSystemTime() < _safetyTimeout){
+        //std::cout << "latent danger, remaining " << (_safetyTimeout - getSystemTime()) << "us" << std::endl;
+        return false;
+    }
+    else{
         return true;
     }
 }
