@@ -65,6 +65,10 @@ private:
     // Calculate average value
     AvgCov *_avg_posError = new AvgCov(3, "_posError", true, 1000, 1000, 1);
     AvgCov *_avg_angError = new AvgCov(3, "_angError", true, 1000, 1000, 1000);
+
+    uint idling = 0;
+    const uint idling_limit = 500;
+    float idling_pos[3] = {0.0, 0.67, -1.3};
 };
 
 #endif  // TROTTING_H

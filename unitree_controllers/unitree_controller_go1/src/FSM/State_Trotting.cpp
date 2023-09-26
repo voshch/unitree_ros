@@ -71,6 +71,7 @@ FSMStateName State_Trotting::checkChange(){
 }
 
 void State_Trotting::run(){
+
     _posBody = _est->getPosition();
     _velBody = _est->getVelocity();
     _posFeet2BGlobal = _est->getPosFeet2BGlobal();
@@ -92,23 +93,57 @@ void State_Trotting::run(){
     calcTau();
     calcQQd();
 
-    if(checkStepOrNot()){
-        _ctrlComp->setStartWave();
-    }else{
-        _ctrlComp->setAllStance();
+    if(_vCmdBody(0) || _vCmdBody(1) || _dYawCmd){
+        idling = 0;
     }
 
-    _lowCmd->setTau(_tau);
-    _lowCmd->setQ(vec34ToVec12(_qGoal));
-    _lowCmd->setQd(vec34ToVec12(_qdGoal));
 
-    for(int i(0); i<4; ++i){
-        if((*_contact)(i) == 0){
-            _lowCmd->setSwingGain(i);
+    if(idling >= idling_limit){
+
+        if(idling == idling_limit){
+            std::cout << "time to idle" << std::endl;
+        }
+ 
+        for(int i=0; i<4; i++){
+            if(_ctrlComp->ctrlPlatform == CtrlPlatform::GAZEBO){
+                _lowCmd->setSimStanceGain(i);
+            }
+            else if(_ctrlComp->ctrlPlatform == CtrlPlatform::REALROBOT){
+                _lowCmd->setRealStanceGain(i);
+            }
+            _lowCmd->setZeroDq(i);
+            _lowCmd->setZeroTau(i);
+        }
+        for(int i=0; i<12; i++){
+            _lowCmd->motorCmd[i].mode = 0x0A;
+            _lowCmd->motorCmd[i].q = idling_pos[i % 3];
+        }
+        _ctrlComp->setAllStance();
+        
+        idling = idling_limit;
+    }
+    else{
+        if(checkStepOrNot()){
+            _ctrlComp->setStartWave();
         }else{
-            _lowCmd->setStableGain(i);
+            _ctrlComp->setAllStance();
+        }
+
+        _lowCmd->setTau(_tau);
+        _lowCmd->setQ(vec34ToVec12(_qGoal));
+        _lowCmd->setQd(vec34ToVec12(_qdGoal));
+
+        for(int i(0); i<4; ++i){
+            if((*_contact)(i) == 0){
+                _lowCmd->setSwingGain(i);
+                idling = 0;
+            }else{
+                _lowCmd->setStableGain(i);
+            }
         }
     }
+
+    idling++;
 
 }
 
