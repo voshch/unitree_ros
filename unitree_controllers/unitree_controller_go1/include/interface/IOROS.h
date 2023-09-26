@@ -16,6 +16,7 @@
 #include <string>
 #include "interface/ROSParams.h"
 #include <geometry_msgs/Twist.h>
+#include <rosgraph_msgs/Clock.h>
 
 class IOROS : public IOInterface{
 public:
@@ -23,6 +24,8 @@ public:
     ~IOROS();
     void sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
     ROSParams* params;
+
+    bool isPaused();
 
 private:
     void sendCmd(const LowlevelCmd *cmd);
@@ -55,6 +58,10 @@ private:
     void RLhipCallback(const unitree_legged_msgs::MotorState& msg);
     void RLthighCallback(const unitree_legged_msgs::MotorState& msg);
     void RLcalfCallback(const unitree_legged_msgs::MotorState& msg);
+    
+    ros::Subscriber _clockSub;
+    ros::Time clock, lastPublish;
+    void UpdateClock(const rosgraph_msgs::Clock& msg);
     };
 
 #endif  // IOROS_H

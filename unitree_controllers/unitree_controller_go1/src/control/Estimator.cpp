@@ -125,6 +125,7 @@ void Estimator::_initSystem(){
 
     /* ROS odometry publisher */
     #ifdef COMPILE_WITH_MOVE_BASE
+        _sub = _nh.subscribe("/clock", 1, &Estimator::UpdateClock, this);
         _pub = _nh.advertise<nav_msgs::Odometry>(_robotNamespace + "/odom", 1);
 
         #ifdef COMPILE_WITH_SIMULATION
@@ -197,8 +198,9 @@ void Estimator::run(){
             _odomTF.transform.rotation.y = _lowState->imu.quaternion[2];
             _odomTF.transform.rotation.z = _lowState->imu.quaternion[3];
             
-            if(_lowState->imu.quaternion[0] != 0 && !std::isnan(_xhat(2)) )
+            if(lastPublish < clock && (_lowState->imu.quaternion[0] != 0 && !std::isnan(_xhat(2))))
                 _odomBroadcaster.sendTransform(_odomTF);
+            lastPublish = clock;
 
             /* odometry */
             _odomMsg.header.stamp = _currentTime;
@@ -269,4 +271,14 @@ Vec34 Estimator::getPosFeet2BGlobal(){
     }
     return feet2BPos;
 }
+
+#ifdef COMPILE_WITH_MOVE_BASE
+
+
+void Estimator::UpdateClock(const rosgraph_msgs::Clock& msg){
+    clock = msg.clock;
+}
+
+
+#endif
 

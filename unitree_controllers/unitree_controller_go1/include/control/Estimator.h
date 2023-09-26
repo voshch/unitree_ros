@@ -23,6 +23,7 @@
     #include <nav_msgs/Odometry.h>
     #include <geometry_msgs/Twist.h>
     #include <boost/array.hpp>
+    #include <rosgraph_msgs/Clock.h>
 #endif  // COMPILE_WITH_MOVE_BASE
 
 class Estimator{
@@ -100,6 +101,7 @@ private:
     ros::NodeHandle _nh;
     std::string _robotNamespace;
     ros::Publisher _pub;
+    ros::Subscriber _sub;
     tf::TransformBroadcaster _odomBroadcaster;
     ros::Time _currentTime;
     geometry_msgs::TransformStamped _odomTF;
@@ -120,6 +122,10 @@ private:
                                         0, 0, 0, 1e6, 0, 0, 
                                         0, 0, 0, 0, 1e6, 0, 
                                         0, 0, 0, 0, 0, 1e-9};
+
+    ros::Time clock, lastPublish;
+    void UpdateClock(const rosgraph_msgs::Clock& msg);
+
 #endif  // COMPILE_WITH_MOVE_BASE
 
 };
