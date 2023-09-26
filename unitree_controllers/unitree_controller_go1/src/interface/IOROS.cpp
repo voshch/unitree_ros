@@ -126,15 +126,17 @@ void IOROS::initRecv(bool blocking = false){
 
     if(blocking){
 
-        ROS_INFO("waiting for IMU");
-        boost::shared_ptr<sensor_msgs::Imu const>  imu_msg;
-        
-        do{
-            imu_msg = ros::topic::waitForMessage<sensor_msgs::Imu>(_imu_sub.getTopic(), _nm);
-        }
-        while(!imu_msg || std::isnan(imu_msg->orientation.w) || imu_msg->orientation.w == 0);
+        #ifdef COMPILE_WITH_MOVE_BASE
+            ROS_INFO("waiting for cmd_vel");
+            boost::shared_ptr<geometry_msgs::Twist const>  msg;
+            
+            do{
+                msg = ros::topic::waitForMessage<geometry_msgs::Twist>(params->robotNamespace + "/cmd_vel", _nm);
+            }
+            while(!msg);
 
-        ROS_INFO("valid IMU message received");
+            ROS_INFO("valid cmd_vel message received");
+        #endif
     }
 }
 

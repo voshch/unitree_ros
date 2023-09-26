@@ -15,6 +15,7 @@
 #include <sensor_msgs/Imu.h>
 #include <string>
 #include "interface/ROSParams.h"
+#include <geometry_msgs/Twist.h>
 
 class IOROS : public IOInterface{
 public:
