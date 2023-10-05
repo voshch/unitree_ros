@@ -54,10 +54,10 @@ void IOROS::sendRecv(const LowlevelCmd *cmd, LowlevelState *state){
 
 void IOROS::sendCmd(const LowlevelCmd *lowCmd){
 
-    if(isPaused()){
+    if(isPaused){
         return;
     }
-    lastPublish = clock;
+    // lastPublish = clock;
 
     for(int i(0); i < 12; ++i){
         _lowCmd.motorCmd[i].mode = lowCmd->motorCmd[i].mode;
@@ -82,6 +82,7 @@ void IOROS::sendCmd(const LowlevelCmd *lowCmd){
 }
 
 void IOROS::recvState(LowlevelState *state){
+
     for(int i(0); i < 12; ++i){
         state->motorState[i].q = _lowState.motorState[i].q;
         state->motorState[i].dq = _lowState.motorState[i].dq;
@@ -113,9 +114,26 @@ void IOROS::initSend(){
 }
 
 void IOROS::initRecv(bool blocking = false){
+
+    if(blocking){
+
+        ROS_INFO("waiting for clock");
+        boost::shared_ptr<rosgraph_msgs::Clock const> msg;
+        
+        do{
+            msg = ros::topic::waitForMessage<rosgraph_msgs::Clock>("/clock", _nm);
+        }
+        while(!msg);
+
+        ROS_INFO("valid clock message received");
+    }
+
+    _clockSub = _nm.subscribe("/clock", 1, &IOROS::UpdateClock, this);
+
     std::string trunk_topic = params->robotNamespace + "/trunk_imu";
     ROS_INFO("subscribing %s", trunk_topic.c_str());
     _imu_sub = _nm.subscribe(trunk_topic, 1, &IOROS::imuCallback, this);
+
     ROS_INFO("subscribing %s/XX_YY_controller/state", params->robotNamespace.c_str());
     _servo_sub[0] = _nm.subscribe(params->robotNamespace +  "/FR_hip_controller/state", 1, &IOROS::FRhipCallback, this);
     _servo_sub[1] = _nm.subscribe(params->robotNamespace +  "/FR_thigh_controller/state", 1, &IOROS::FRthighCallback, this);
@@ -129,30 +147,18 @@ void IOROS::initRecv(bool blocking = false){
     _servo_sub[9] = _nm.subscribe(params->robotNamespace +  "/RL_hip_controller/state", 1, &IOROS::RLhipCallback, this);
     _servo_sub[10] = _nm.subscribe(params->robotNamespace + "/RL_thigh_controller/state", 1, &IOROS::RLthighCallback, this);
     _servo_sub[11] = _nm.subscribe(params->robotNamespace + "/RL_calf_controller/state", 1, &IOROS::RLcalfCallback, this);
-    _clockSub = _nm.subscribe("/clock", 1, &IOROS::UpdateClock, this);
-
-    if(blocking){
-
-        #ifdef COMPILE_WITH_MOVE_BASE
-            ROS_INFO("waiting for clock");
-            boost::shared_ptr<rosgraph_msgs::Clock const>  msg;
-            
-            do{
-                msg = ros::topic::waitForMessage<rosgraph_msgs::Clock>("/clock", _nm);
-            }
-            while(!msg);
-
-            ROS_INFO("valid clock message received");
-        #endif
-    }
 }
 
 void IOROS::UpdateClock(const rosgraph_msgs::Clock & msg){
+    isPaused = clock == msg.clock;
+    wasPaused |= isPaused;
     clock = msg.clock;
-}
 
-bool IOROS::isPaused(){
-    return lastPublish <= clock;
+    if(wasPaused != isPaused){
+        // std::cout << "was paused, but not anymore" << std::endl;
+        // initRecv(true);
+        wasPaused = false;
+    }
 }
 
 void IOROS::imuCallback(const sensor_msgs::Imu & msg)
@@ -169,6 +175,8 @@ void IOROS::imuCallback(const sensor_msgs::Imu & msg)
     _lowState.imu.accelerometer[0] = msg.linear_acceleration.x;
     _lowState.imu.accelerometer[1] = msg.linear_acceleration.y;
     _lowState.imu.accelerometer[2] = msg.linear_acceleration.z;
+
+    // lastRecv = clock;
 }
 
 void IOROS::FRhipCallback(const unitree_legged_msgs::MotorState& msg)

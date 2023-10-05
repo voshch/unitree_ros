@@ -121,12 +121,12 @@ bool FSM::checkSafty(){
     // The angle with z axis less than 60 degree
     if(_ctrlComp->lowState->getRotMat()(2,2) < 0.5 ){
         _safetyTimeout = getSystemTime() + 1e6; // 1s  
-        //std::cout << "active danger" << std::endl;
+        // std::cout << "active danger " << _ctrlComp->lowState->getRotMat()(2,2) << std::endl;
         return false;
     }
     //keep waiting
     else if(getSystemTime() < _safetyTimeout){
-        //std::cout << "latent danger, remaining " << (_safetyTimeout - getSystemTime()) << "us" << std::endl;
+        // std::cout << "latent danger, remaining " << (_safetyTimeout - getSystemTime()) << "us" << std::endl;
         return false;
     }
     else{

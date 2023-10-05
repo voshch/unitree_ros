@@ -25,8 +25,6 @@ public:
     void sendRecv(const LowlevelCmd *cmd, LowlevelState *state);
     ROSParams* params;
 
-    bool isPaused();
-
 private:
     void sendCmd(const LowlevelCmd *cmd);
     void recvState(LowlevelState *state);
@@ -60,7 +58,8 @@ private:
     void RLcalfCallback(const unitree_legged_msgs::MotorState& msg);
     
     ros::Subscriber _clockSub;
-    ros::Time clock, lastPublish;
+    ros::Time clock /*, lastPublish, lastRecv*/;
+    bool isPaused = true, wasPaused = true;
     void UpdateClock(const rosgraph_msgs::Clock& msg);
     };
 
