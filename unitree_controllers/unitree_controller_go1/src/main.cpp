@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     CtrlPlatform ctrlPlat;
 
 #ifdef COMPILE_WITH_SIMULATION
-    bool blocking = true; //set to true if simulation isn't valid immediately
+    bool blocking = false; //set to true if simulation isn't valid immediately
     ioInter = new IOROS(blocking);
     ctrlPlat = CtrlPlatform::GAZEBO;
 #endif // COMPILE_WITH_SIMULATION
