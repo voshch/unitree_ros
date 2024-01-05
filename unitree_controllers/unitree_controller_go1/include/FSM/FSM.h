@@ -20,6 +20,9 @@
 #include "FSM/State_move_base.h"
 #endif // COMPILE_WITH_MOVE_BASE
 
+#include "ros/ros.h"
+#include "std_msgs/Bool.h"
+
 struct FSMStateList
 {
     FSMState *invalid;
@@ -72,6 +75,12 @@ private:
     long long _startTime;
     long long _safetyTimeout = 0ll;
     int count;
+
+    // Task Reset
+    float time2repeatCheckTarget;
+    ros::NodeHandle _nh;
+    ros::Publisher _resetTaskPub;
+    std_msgs::Bool _resetTask;
 };
 
 #endif // FSM_H

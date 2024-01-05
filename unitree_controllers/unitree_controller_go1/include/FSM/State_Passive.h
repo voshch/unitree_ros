@@ -13,6 +13,7 @@ public:
     void run();
     void exit();
     FSMStateName checkChange();
+    FSMStateName checkChange(FSMStateName targetState);
 };
 
 #endif  // PASSIVE_H

@@ -81,7 +81,8 @@ int main(int argc, char **argv)
 #ifdef ROBOT_TYPE_Go1
     ctrlComp->robotModel = new Go1Robot();
 #endif
-
+	// ctrlComp->waveGen = new WaveGenerator(0.35, 0.5, Vec4(0, 0.5, 0.5, 0)); // Trot
+	// original
     ctrlComp->waveGen = new WaveGenerator(0.45, 0.5, Vec4(0, 0.5, 0.5, 0)); // Trot
     // ctrlComp->waveGen = new WaveGenerator(1.1, 0.75, Vec4(0, 0.25, 0.5, 0.75));  //Crawl, only for sim
     // ctrlComp->waveGen = new WaveGenerator(0.4, 0.6, Vec4(0, 0.5, 0.5, 0));  //Walking Trot, only for sim

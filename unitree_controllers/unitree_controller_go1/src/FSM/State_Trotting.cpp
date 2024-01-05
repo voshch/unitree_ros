@@ -58,20 +58,50 @@ void State_Trotting::exit(){
     _ctrlComp->setAllSwing();
 }
 
-FSMStateName State_Trotting::checkChange(){
+FSMStateName State_Trotting::checkChange() {
     if(_lowState->userCmd == UserCommand::L2_B){
-        return FSMStateName::PASSIVE;
+        timeStepT2F = 0;
+        return checkTime4Change(timeStepT2P, FSMStateName::PASSIVE);
     }
     else if(_lowState->userCmd == UserCommand::L2_A){
-        return FSMStateName::FIXEDSTAND;
+        timeStepT2P = 0;
+        return checkTime4Change(timeStepT2F, FSMStateName::FIXEDSTAND);
     }
     else{
+        timeStepT2P = 0;
+        timeStepT2F = 0;
+        return FSMStateName::TROTTING;
+    }
+}
+
+FSMStateName State_Trotting::checkChange(FSMStateName targetState){
+    if(targetState == FSMStateName::PASSIVE){
+        timeStepT2F = 0;
+        return checkTime4Change(timeStepT2P, FSMStateName::PASSIVE);
+    }
+    else if(targetState == FSMStateName::FIXEDSTAND){
+        timeStepT2P = 0;
+        return checkTime4Change(timeStepT2F, FSMStateName::FIXEDSTAND);
+    }
+    else{
+        timeStepT2P = 0;
+        timeStepT2F = 0;
+        return FSMStateName::TROTTING;
+    }
+}
+
+FSMStateName State_Trotting::checkTime4Change(int& timeStep, FSMStateName stateName) {
+    if (timeStep > duration) {
+        timeStep = 0;
+        return stateName;
+    }
+    else {
+        timeStep ++;
         return FSMStateName::TROTTING;
     }
 }
 
 void State_Trotting::run(){
-
     _posBody = _est->getPosition();
     _velBody = _est->getVelocity();
     _posFeet2BGlobal = _est->getPosFeet2BGlobal();
@@ -170,7 +200,7 @@ void State_Trotting::setHighCmd(double vx, double vy, double wz){
 
 void State_Trotting::getUserCmd(){
     /* Movement */
-    _vCmdBody(0) =  invNormalize(_userValue.ly, _vxLim(0), _vxLim(1));
+    _vCmdBody(0) =  invNormalize(_userValue.ly, _vxLim(0), _vxLim(1)); 
     _vCmdBody(1) = -invNormalize(_userValue.lx, _vyLim(0), _vyLim(1));
     _vCmdBody(2) = 0;
 
@@ -210,7 +240,7 @@ void State_Trotting::calcTau(){
     _ddPcd(1) = saturation(_ddPcd(1), Vec2(-3, 3));
     _ddPcd(2) = saturation(_ddPcd(2), Vec2(-5, 5));
 
-    _dWbd(0) = saturation(_dWbd(0), Vec2(-40, 40));
+    _dWbd(0) = saturation(_dWbd(0), Vec2(-50, 50));
     _dWbd(1) = saturation(_dWbd(1), Vec2(-40, 40));
     _dWbd(2) = saturation(_dWbd(2), Vec2(-10, 10));
 

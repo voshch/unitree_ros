@@ -22,8 +22,16 @@ IOROS::IOROS(bool blocking):IOInterface(){
     ROS_INFO("The control interface for ROS Gazebo simulation");
     
     params = new ROSParams();
+
+    // normal
     _nm.param<std::string>("robot_namespace", params->robotNamespace, "/UNKNOWN_NAMESPACE");
     _nm.param<int>("target_state", params->targetState, -1);
+
+    // for sudo ./devel/lib/unitree_controller_go1/unitree_controller
+    // _nm.param<std::string>("/go1/robot_namespace", params->robotNamespace, "/UNKNOWN_NAMESPACE");
+    // _nm.param<int>("/go1/target_state", params->targetState, -1);
+
+    std::cout << "robot_namespace: " << params->robotNamespace << "\t target_state " << params->targetState << std::endl;
 
     // start subscriber
     initRecv(blocking);

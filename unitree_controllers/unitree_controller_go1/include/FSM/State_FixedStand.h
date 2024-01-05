@@ -6,6 +6,7 @@
 
 #include "FSM/FSMState.h"
 
+
 class State_FixedStand : public FSMState{
 public:
     State_FixedStand(CtrlComponents *ctrlComp);
@@ -13,8 +14,11 @@ public:
     void enter();
     void run();
     void exit();
-    FSMStateName checkChange();
+    virtual FSMStateName checkChange();
 
+    virtual FSMStateName checkChange(FSMStateName targetState);
+    
+    FSMStateName checkTime4Change();
 protected:
     virtual bool isReached(){
         return _percent == 1.f;
@@ -26,6 +30,9 @@ private:
     float _startPos[12];
     float _duration = 1000;   //steps
     float _percent = 0;       //%
+
+    //
+    int timeStepF2M = 0;
 };
 
 #endif  // FIXEDSTAND_H

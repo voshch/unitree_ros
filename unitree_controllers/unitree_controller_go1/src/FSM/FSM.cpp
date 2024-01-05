@@ -35,11 +35,12 @@ FSM::~FSM(){
 }
 
 void FSM::initialize(){
-
     _currentState = _stateList.passive;
-    _currentState -> enter();
+    _currentState->enter();
     _nextState = _currentState;
     _mode = FSMMode::NORMAL;
+    _resetTask.data = false;
+    _resetTaskPub = _nh.advertise<std_msgs::Bool>("reset_task", 10);
 }
 
 void FSM::run(){
@@ -47,12 +48,34 @@ void FSM::run(){
     _ctrlComp->sendRecv();
     _ctrlComp->runWaveGen();
     _ctrlComp->estimator->run();
+
     if(!checkSafty()){
-        // _ctrlComp->ioInter->setPassive(); nice safety
         _nextState = _stateList.danger;
         _mode = FSMMode::CHANGE;
     }
-
+    else if (!_resetTask.data) {
+        if (_ctrlComp->estimator->reachTarget()) {
+            std::cout << "Target reached, resetting task...\n";
+            time2repeatCheckTarget = 0.0;
+            _resetTask.data = true;
+            _targetState = FSMStateName::PASSIVE;
+        }
+    }
+    else if (_resetTask.data){
+        if (time2repeatCheckTarget >= 8) {
+            _ctrlComp->estimator->callInitSystem();
+            _resetTask.data = false;
+            // Publish the message
+            _resetTaskPub.publish(_resetTask);
+            if(_ctrlComp->params)
+                _targetState = (FSMStateName) _ctrlComp->params->targetState;
+        }
+        else if (time2repeatCheckTarget >= 6) {
+            _resetTaskPub.publish(_resetTask);
+        }
+        time2repeatCheckTarget += _ctrlComp->dt;
+    }
+    
     if(_mode == FSMMode::NORMAL){
         _currentState->run();
         _nextStateName = _currentState->checkChangeOverride(_targetState);
@@ -71,7 +94,6 @@ void FSM::run(){
         _mode = FSMMode::NORMAL;
         _currentState->run();
     }
-
     absoluteWait(_startTime, (long long)(_ctrlComp->dt * 1000000));
 }
 
@@ -117,7 +139,6 @@ FSMState* FSM::getNextState(FSMStateName stateName){
 }
 
 bool FSM::checkSafty(){
-    
     // The angle with z axis less than 60 degree
     if(_ctrlComp->lowState->getRotMat()(2,2) < 0.5 ){
         _safetyTimeout = getSystemTime() + 1e6; // 1s  

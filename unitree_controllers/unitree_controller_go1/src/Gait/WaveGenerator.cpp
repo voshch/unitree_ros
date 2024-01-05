@@ -47,7 +47,7 @@ void WaveGenerator::calcContactPhase(Vec4 &phaseResult, VecInt4 &contactResult, 
             _switchStatus.setOnes();
         }
         calcWave(_phasePast, _contactPast, _statusPast);
-        // two special case
+        // two special cases
         if ((status == WaveStatus::STANCE_ALL) && (_statusPast == WaveStatus::SWING_ALL))
         {
             _contactPast.setOnes();

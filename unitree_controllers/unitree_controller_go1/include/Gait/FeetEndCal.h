@@ -19,7 +19,7 @@ private:
 
     Vec3 _nextStep, _footPos;
     Vec3 _bodyVelGlobal;        // linear velocity
-    Vec3 _bodyAccGlobal;        // linear accelerator
+    Vec3 _bodyAccGlobal;        // linear acceleration
     Vec3 _bodyWGlobal;          // angular velocity
 
     Vec4 _feetRadius, _feetInitAngle;

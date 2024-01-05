@@ -39,9 +39,15 @@ public:
     Vec34 getPosFeet2BGlobal();
     void run();
 
+    bool reachTarget();
+    void setPosZero() {
+        _xhat.setZero();
+    }
 #ifdef COMPILE_DEBUG
     void setPyPlot(PyPlot *plot){_testPlot = plot;}
 #endif  // COMPILE_DEBUG
+    //
+    void callInitSystem();
 
 private:
     void _initSystem();
@@ -93,6 +99,9 @@ private:
     AvgCov *_RCheck;
     AvgCov *_uCheck;
     std::string _estName;
+
+    Vec3 startPos;
+    Vec3 targetPos;
 
 #ifdef COMPILE_DEBUG
     PyPlot *_testPlot;

@@ -15,6 +15,8 @@ public:
     State_move_base(CtrlComponents *ctrlComp);
     ~State_move_base(){}
     FSMStateName checkChange();
+    FSMStateName checkChange(FSMStateName targetState);
+
 private:
     void getUserCmd();
     void initRecv();

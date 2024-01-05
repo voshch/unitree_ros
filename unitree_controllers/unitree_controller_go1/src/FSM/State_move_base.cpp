@@ -14,7 +14,7 @@ State_move_base::State_move_base(CtrlComponents *ctrlComp)
     _stateName = FSMStateName::MOVE_BASE;
     _stateNameString = "move_base";
 
-    if(ctrlComp->params){
+    if(ctrlComp->params){   
         robotNamespace = ctrlComp->params->robotNamespace;
     }
 
@@ -22,11 +22,17 @@ State_move_base::State_move_base(CtrlComponents *ctrlComp)
 }
 
 FSMStateName State_move_base::checkChange(){
-    if(_lowState->userCmd == UserCommand::L2_B){
-        return FSMStateName::PASSIVE;
+    if(_lowState->userCmd == UserCommand::L2_B || _lowState->userCmd == UserCommand::L2_A){
+        return FSMStateName::TROTTING;
     }
-    else if(_lowState->userCmd == UserCommand::L2_A){
-        return FSMStateName::FIXEDSTAND;
+    else{
+        return FSMStateName::MOVE_BASE;
+    }
+}
+
+FSMStateName State_move_base::checkChange(FSMStateName targetState) {
+    if(targetState == FSMStateName::PASSIVE || targetState == FSMStateName::FIXEDSTAND){
+        return FSMStateName::TROTTING;
     }
     else{
         return FSMStateName::MOVE_BASE;
@@ -50,3 +56,4 @@ void State_move_base::initRecv(){
 }
 
 #endif  // COMPILE_WITH_MOVE_BASE
+

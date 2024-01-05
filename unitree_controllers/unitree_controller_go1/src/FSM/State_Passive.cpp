@@ -43,10 +43,24 @@ FSMStateName State_Passive::checkChange(){
     if(_lowState->userCmd == UserCommand::L2_A){
         return FSMStateName::FIXEDSTAND;
     }
-    else{
+    else if ((_lowState->userCmd == UserCommand::L2_Y)){
         #ifdef COMPILE_WITH_MOVE_BASE
-            return FSMStateName::MOVE_BASE;
+            return FSMStateName::FIXEDSTAND;
         #endif
-        return FSMStateName::PASSIVE;
     }
+    else 
+        return FSMStateName::PASSIVE;
+}
+
+FSMStateName State_Passive::checkChange(FSMStateName targetState){
+    if(targetState == FSMStateName::FIXEDSTAND){
+        return FSMStateName::FIXEDSTAND;
+    }
+    #ifdef COMPILE_WITH_MOVE_BASE
+    else if ((targetState == FSMStateName::MOVE_BASE)){
+            return FSMStateName::FIXEDSTAND;
+    }
+    #endif
+    else 
+        return FSMStateName::PASSIVE;
 }

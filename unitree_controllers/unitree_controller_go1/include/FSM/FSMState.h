@@ -24,20 +24,27 @@ public:
     virtual void run() = 0;
     virtual void exit() = 0;
     virtual FSMStateName checkChange() {return FSMStateName::INVALID;}
+    virtual FSMStateName checkChange(FSMStateName targetState) {return FSMStateName::INVALID;}
     FSMStateName checkChangeOverride(FSMStateName targetState) {
 
-        if(targetState == FSMStateName::INVALID)
+        if (targetState == FSMStateName::INVALID) 
             return checkChange();
+        #ifdef COMPILE_WITH_MOVE_BASE
+        else if (_stateName == FSMStateName::PASSIVE || _stateName == FSMStateName::FIXEDSTAND || 
+                _stateName == FSMStateName::TROTTING ||_stateName == FSMStateName::MOVE_BASE) {
+            return checkChange(targetState);
+        }
+        #endif  // COMPILE_WITH_MOVE_BASE    
 
-        if(_stateName == targetState)
-            return targetState;
+        // if(_stateName == targetState)
+        //     return targetState;
 
-        if(_stateName == FSMStateName::FIXEDSTAND && isReached())
-            return targetState;
+        // if(_stateName == FSMStateName::FIXEDSTAND && isReached())
+        //     return targetState;
         
         return FSMStateName::FIXEDSTAND;
     }
-
+    
     FSMStateName _stateName;
     std::string _stateNameString;
 protected:
@@ -47,8 +54,8 @@ protected:
     LowlevelCmd *_lowCmd;
     LowlevelState *_lowState;
     UserValue _userValue;
-
-    virtual bool isReached(){return false;}
+    int duration = 800;
+    virtual bool isReached() {return false;}
 };
 
 #endif  // FSMSTATE_H
