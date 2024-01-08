@@ -10,7 +10,7 @@ State_Trotting::State_Trotting(CtrlComponents *ctrlComp)
               _contact(ctrlComp->contact), _robModel(ctrlComp->robotModel), 
               _balCtrl(ctrlComp->balCtrl){
     _gait = new GaitGenerator(ctrlComp);
-
+    _dYawCmdPast = 0.0;
     _gaitHeight = 0.08;
 
 #ifdef ROBOT_TYPE_Go1
