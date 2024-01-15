@@ -151,7 +151,7 @@ bool FSM::checkSafety(){
     currOrientation = eulerAngles(_ctrlComp->lowState->getRotMat())*180/M_PI;
     // std::cout << "Orientation:\n " << orientation << std::endl;
     // Check if angle to z-axis is greater than 60 degrees (in absolute value)
-    if(fabs(currOrientation(0)) >= 60 || fabs(currOrientation(0)) >= 60){
+    if(fabs(currOrientation(0)) >= 60 || fabs(currOrientation(1)) >= 60){
         _safetyTimeout = getSystemTime() + 1e6; // 1s  
         std::cout << "DANGER!\n";
         return false;
