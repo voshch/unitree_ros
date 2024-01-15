@@ -64,7 +64,7 @@ public:
 private:
     void initialize();
     FSMState *getNextState(FSMStateName stateName);
-    bool checkSafty();
+    bool checkSafety();
     CtrlComponents *_ctrlComp;
     FSMState *_currentState;
     FSMState *_nextState;
@@ -79,8 +79,18 @@ private:
     // Task Reset
     float time2repeatCheckTarget;
     ros::NodeHandle _nh;
-    ros::Publisher _resetTaskPub;
+    // ros::Publisher _resetTaskPub;
+    ros::Subscriber _resetTaskSub;
     std_msgs::Bool _resetTask;
+    void reachedTargetCallback(const std_msgs::Bool::ConstPtr& msg);
+    
+    // Reset in case of Danger mode
+    bool useCheckSafety = true;
+    ros::Publisher _dangerModePub;
+    std_msgs::Bool _dangerMode;
+
+    bool initSys = true;
+    Vec3 currOrientation; // in degrees
 };
 
 #endif // FSM_H

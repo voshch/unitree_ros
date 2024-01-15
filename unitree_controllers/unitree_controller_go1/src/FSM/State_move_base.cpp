@@ -33,6 +33,7 @@ FSMStateName State_move_base::checkChange(){
 FSMStateName State_move_base::checkChange(FSMStateName targetState) {
     if(targetState == FSMStateName::PASSIVE || targetState == FSMStateName::FIXEDSTAND){
         return FSMStateName::TROTTING;
+        // return targetState;
     }
     else{
         return FSMStateName::MOVE_BASE;

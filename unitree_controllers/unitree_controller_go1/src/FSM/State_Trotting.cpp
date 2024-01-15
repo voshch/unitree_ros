@@ -42,6 +42,8 @@ State_Trotting::~State_Trotting(){
 }
 
 void State_Trotting::enter(){
+    brake = false;
+
     _pcd = _est->getPosition();
     _pcd(2) = -_robModel->getFeetPosIdeal()(2, 0);
     _vCmdBody.setZero();
@@ -59,46 +61,28 @@ void State_Trotting::exit(){
 }
 
 FSMStateName State_Trotting::checkChange() {
-    if(_lowState->userCmd == UserCommand::L2_B){
-        timeStepT2F = 0;
-        return checkTime4Change(timeStepT2P, FSMStateName::PASSIVE);
-    }
-    else if(_lowState->userCmd == UserCommand::L2_A){
-        timeStepT2P = 0;
-        return checkTime4Change(timeStepT2F, FSMStateName::FIXEDSTAND);
-    }
-    else{
-        timeStepT2P = 0;
-        timeStepT2F = 0;
-        return FSMStateName::TROTTING;
-    }
+    FSMStateName userState = getStateFromUser();
+    return getNextState(userState);
 }
 
-FSMStateName State_Trotting::checkChange(FSMStateName targetState){
-    if(targetState == FSMStateName::PASSIVE){
-        timeStepT2F = 0;
-        return checkTime4Change(timeStepT2P, FSMStateName::PASSIVE);
-    }
-    else if(targetState == FSMStateName::FIXEDSTAND){
-        timeStepT2P = 0;
-        return checkTime4Change(timeStepT2F, FSMStateName::FIXEDSTAND);
-    }
-    else{
-        timeStepT2P = 0;
-        timeStepT2F = 0;
-        return FSMStateName::TROTTING;
-    }
+FSMStateName State_Trotting::checkChange(FSMStateName targetState) {
+    return getNextState(targetState);
 }
 
-FSMStateName State_Trotting::checkTime4Change(int& timeStep, FSMStateName stateName) {
-    if (timeStep > duration) {
-        timeStep = 0;
-        return stateName;
-    }
-    else {
-        timeStep ++;
+FSMStateName State_Trotting::getNextState(FSMStateName nextState) {
+    if((nextState == FSMStateName::PASSIVE || nextState == FSMStateName::FIXEDSTAND))
+        if (_ctrlComp->estimator->notMoving()) 
+            return nextState;
+        else { 
+            brake = true;
+            return FSMStateName::TROTTING;
+        }
+    #ifdef COMPILE_WITH_MOVE_BASE
+    else if (nextState == FSMStateName::MOVE_BASE) 
+        return FSMStateName::MOVE_BASE;
+    #endif  // COMPILE_WITH_MOVE_BASE
+    else
         return FSMStateName::TROTTING;
-    }
 }
 
 void State_Trotting::run(){
@@ -114,7 +98,11 @@ void State_Trotting::run(){
 
     _userValue = _lowState->userValue;
 
-    getUserCmd();
+    if (!brake)
+        getUserCmd();
+    else {
+        setHighCmd(0.0,0.0,0.0);
+    }
     calcCmd();
 
     _gait->setGait(_vCmdGlobal.segment(0,2), _wCmdGlobal(2), _gaitHeight);

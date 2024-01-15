@@ -3,6 +3,9 @@
 ***********************************************************************/
 #include "FSM/FSM.h"
 #include <iostream>
+#include "FSM.h"
+
+Vec3 eulerAngles(RotMat rotMat);
 
 FSM::FSM(CtrlComponents *ctrlComp)
     :_ctrlComp(ctrlComp){
@@ -40,7 +43,11 @@ void FSM::initialize(){
     _nextState = _currentState;
     _mode = FSMMode::NORMAL;
     _resetTask.data = false;
-    _resetTaskPub = _nh.advertise<std_msgs::Bool>("reset_task", 10);
+    // _resetTaskPub = _nh.advertise<std_msgs::Bool>("reset_task", 10);
+    _resetTaskSub = _nh.subscribe("reset_task", 10, &FSM::reachedTargetCallback, this);
+    
+    _dangerMode.data = false;
+    _dangerModePub = _nh.advertise<std_msgs::Bool>("danger_mode", 10);
 }
 
 void FSM::run(){
@@ -49,33 +56,35 @@ void FSM::run(){
     _ctrlComp->runWaveGen();
     _ctrlComp->estimator->run();
 
-    if(!checkSafty()){
+    if(!checkSafety()){
         _nextState = _stateList.danger;
         _mode = FSMMode::CHANGE;
-    }
-    else if (!_resetTask.data) {
-        if (_ctrlComp->estimator->reachTarget()) {
-            std::cout << "Target reached, resetting task...\n";
-            time2repeatCheckTarget = 0.0;
-            _resetTask.data = true;
-            _targetState = FSMStateName::PASSIVE;
-        }
-    }
-    else if (_resetTask.data){
-        if (time2repeatCheckTarget >= 8) {
+        if (!_dangerMode.data) {
             _ctrlComp->estimator->callInitSystem();
-            _resetTask.data = false;
-            // Publish the message
-            _resetTaskPub.publish(_resetTask);
-            if(_ctrlComp->params)
-                _targetState = (FSMStateName) _ctrlComp->params->targetState;
+            _dangerMode.data = true;
+            _dangerModePub.publish(_dangerMode);
         }
-        else if (time2repeatCheckTarget >= 6) {
-            _resetTaskPub.publish(_resetTask);
-        }
-        time2repeatCheckTarget += _ctrlComp->dt;
     }
-    
+    else {
+        if (_dangerMode.data) {
+            _dangerMode.data = false;
+            _dangerModePub.publish(_dangerMode);
+        }
+        if (_resetTask.data) {
+            if (initSys)
+                _ctrlComp->estimator->callInitSystem();
+            _nextStateName =_currentState->checkChangeOverride(FSMStateName::PASSIVE);
+            if (_nextStateName != _currentState->_stateName){
+                _nextState = getNextState(_nextStateName);
+            }
+            _mode = FSMMode::CHANGE;
+            initSys = false;
+        }
+        else
+            initSys = true;
+
+    }
+
     if(_mode == FSMMode::NORMAL){
         _currentState->run();
         _nextStateName = _currentState->checkChangeOverride(_targetState);
@@ -138,19 +147,62 @@ FSMState* FSM::getNextState(FSMStateName stateName){
     }
 }
 
-bool FSM::checkSafty(){
-    // The angle with z axis less than 60 degree
-    if(_ctrlComp->lowState->getRotMat()(2,2) < 0.5 ){
+bool FSM::checkSafety(){
+    currOrientation = eulerAngles(_ctrlComp->lowState->getRotMat())*180/M_PI;
+    // std::cout << "Orientation:\n " << orientation << std::endl;
+    // Check if angle to z-axis is greater than 60 degrees (in absolute value)
+    if(fabs(currOrientation(0)) >= 60 || fabs(currOrientation(0)) >= 60){
         _safetyTimeout = getSystemTime() + 1e6; // 1s  
-        // std::cout << "active danger " << _ctrlComp->lowState->getRotMat()(2,2) << std::endl;
+        std::cout << "DANGER!\n";
         return false;
     }
     //keep waiting
     else if(getSystemTime() < _safetyTimeout){
-        // std::cout << "latent danger, remaining " << (_safetyTimeout - getSystemTime()) << "us" << std::endl;
+        // std::cout << "latent danger, remaining " << (_safetyTimeout - getSystemTime())/1e6 << "s" << std::endl;
         return false;
     }
     else{
         return true;
     }
+}
+
+void FSM::reachedTargetCallback(const std_msgs::Bool::ConstPtr& msg) {
+    _resetTask.data = msg->data;
+    if (_resetTask.data) {
+        std::cout << "Target reached, resetting...\n";
+    }
+}
+
+Vec3 eulerAngles(RotMat rotMat) {
+    // float theta1, theta2, psi1, psi2, phi1, phi2, theta, psi, phi;
+    float psi, theta, phi;
+    Vec3 angles;
+    if (fabs(rotMat(2,0)) != 1) {
+        // theta1 = -std::asin(rotMat(2,0));
+        // theta2 = M_PI - theta1;
+        // psi1 = std::atan2(rotMat(2,1)/std::cos(theta1), rotMat(2,2)/std::cos(theta1));
+        // psi2 = std::atan2(rotMat(2,1)/std::cos(theta2), rotMat(2,2)/std::cos(theta2));
+        // phi1 = std::atan2(rotMat(1,0)/std::cos(theta1), rotMat(0,0)/std::cos(theta1));
+        // phi2 = std::atan2(rotMat(1,0)/std::cos(theta2), rotMat(0,0)/std::cos(theta2));
+        // angles << psi1, theta1, phi1;
+
+        theta = -std::asin(rotMat(2,0));
+        psi = std::atan2(rotMat(2,1)/std::cos(theta), rotMat(2,2)/std::cos(theta));
+        phi = std::atan2(rotMat(1,0)/std::cos(theta), rotMat(0,0)/std::cos(theta));
+
+    }
+    else {
+        phi = 0;
+        if (rotMat(2,0) ==  -1) {
+            theta = M_PI/2;
+            psi = phi + std::atan2(rotMat(0,1),rotMat(0,2));
+        }
+        else {
+            theta = -M_PI/2;
+            psi = -phi + std::atan2(-rotMat(0,1),-rotMat(0,2));
+        }
+        // angles << psi, theta, phi;
+    }
+    angles << psi, theta, phi;
+    return angles;
 }

@@ -278,20 +278,14 @@ Vec34 Estimator::getPosFeet2BGlobal(){
 
 #ifdef COMPILE_WITH_MOVE_BASE
 
-
 void Estimator::UpdateClock(const rosgraph_msgs::Clock& msg){
     clock = msg.clock;
 }
 
 #endif
 
-bool Estimator::reachTarget() {
-    Vec3 currPos, diffTC;
-    currPos = getPosition() + startPos;
-    diffTC = targetPos - currPos;
-    float diffTCDist = sqrt(diffTC[0]*diffTC[0] + diffTC[1]*diffTC[1]);
-    // std::cout << "Distance left: " << diffTCDist << std::endl;
-    if ( diffTCDist <= 4.3 && fabs(_velBody[0]) <= 0.03 && fabs(_velBody[1]) <= 0.03 && fabs(_wBody(2)) <= 0.2) 
+bool Estimator::notMoving() {
+    if (fabs(_velBody(0)) <= 0.03 && fabs(_velBody(1)) <= 0.03 && fabs(_wBody(2) <= 0.2))
         return true;
     else
         return false;

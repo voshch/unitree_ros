@@ -39,15 +39,16 @@ public:
     Vec34 getPosFeet2BGlobal();
     void run();
 
-    bool reachTarget();
     void setPosZero() {
         _xhat.setZero();
     }
 #ifdef COMPILE_DEBUG
     void setPyPlot(PyPlot *plot){_testPlot = plot;}
 #endif  // COMPILE_DEBUG
+
     //
     void callInitSystem();
+    bool notMoving();
 
 private:
     void _initSystem();
@@ -102,7 +103,8 @@ private:
 
     Vec3 startPos;
     Vec3 targetPos;
-
+    bool _initAngle;
+    
 #ifdef COMPILE_DEBUG
     PyPlot *_testPlot;
 #endif  // COMPILE_DEBUG

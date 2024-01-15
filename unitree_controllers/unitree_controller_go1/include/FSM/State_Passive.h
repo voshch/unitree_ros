@@ -14,6 +14,9 @@ public:
     void exit();
     FSMStateName checkChange();
     FSMStateName checkChange(FSMStateName targetState);
+    FSMStateName getNextState(FSMStateName nextState);
+    float timePassed = 0.0;
+    float waitingTime = 0.8; // s
 };
 
 #endif  // PASSIVE_H

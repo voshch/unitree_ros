@@ -20,13 +20,12 @@ void State_Danger::enter(){
     }
     for(int i=0; i<12; i++){
         _lowCmd->motorCmd[i].mode = 0x0A;
-        // _lowCmd->motorCmd[i].q = _targetPos[i % 3];
-        _lowCmd->motorCmd[i].q = _targetPos[i];
+        _lowCmd->motorCmd[i].q = _targetPos[i % 3];
+        // _lowCmd->motorCmd[i].q = _targetPos[i];
     }
     _ctrlComp->setAllStance();
 }
 
 FSMStateName State_Danger::checkChange(){
     return FSMStateName::PASSIVE;
-    // return FSMStateName::DANGER;
 }

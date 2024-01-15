@@ -25,26 +25,45 @@ public:
     virtual void exit() = 0;
     virtual FSMStateName checkChange() {return FSMStateName::INVALID;}
     virtual FSMStateName checkChange(FSMStateName targetState) {return FSMStateName::INVALID;}
+
     FSMStateName checkChangeOverride(FSMStateName targetState) {
 
         if (targetState == FSMStateName::INVALID) 
             return checkChange();
+
         #ifdef COMPILE_WITH_MOVE_BASE
-        else if (_stateName == FSMStateName::PASSIVE || _stateName == FSMStateName::FIXEDSTAND || 
-                _stateName == FSMStateName::TROTTING ||_stateName == FSMStateName::MOVE_BASE) {
+        if(_stateName == targetState)
+            return targetState;
+        else 
             return checkChange(targetState);
-        }
-        #endif  // COMPILE_WITH_MOVE_BASE    
-
-        // if(_stateName == targetState)
-        //     return targetState;
-
-        // if(_stateName == FSMStateName::FIXEDSTAND && isReached())
-        //     return targetState;
-        
-        return FSMStateName::FIXEDSTAND;
+         #endif  // COMPILE_WITH_MOVE_BASE 
     }
-    
+
+    virtual FSMStateName getStateFromUser() {
+        switch (_lowState->userCmd) {
+            case UserCommand::L2_B:
+                return FSMStateName::PASSIVE;
+            case UserCommand::L2_A:
+                return FSMStateName::FIXEDSTAND;
+            case UserCommand::L2_X: 
+                return FSMStateName::FREESTAND;
+            case UserCommand::START:
+                return FSMStateName::TROTTING;
+            case UserCommand::L1_X: 
+                return FSMStateName::BALANCETEST;
+            case UserCommand::L1_A:
+                return FSMStateName::SWINGTEST;
+            case UserCommand::L1_Y: 
+                return FSMStateName::STEPTEST;
+            #ifdef COMPILE_WITH_MOVE_BASE
+            case UserCommand::L2_Y:
+                return FSMStateName::MOVE_BASE;
+            #endif  // COMPILE_WITH_MOVE_BASE
+            default:
+                return FSMStateName::INVALID;
+        }
+    }
+
     FSMStateName _stateName;
     std::string _stateNameString;
 protected:

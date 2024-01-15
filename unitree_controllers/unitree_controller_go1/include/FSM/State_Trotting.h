@@ -18,7 +18,7 @@ public:
     virtual FSMStateName checkChange();
     virtual FSMStateName checkChange(FSMStateName targetState);
     void setHighCmd(double vx, double vy, double wz);
-    FSMStateName checkTime4Change(int& timeStep, FSMStateName stateName);
+    virtual FSMStateName getNextState(FSMStateName nextState);
 
 private:
     void calcTau();
@@ -72,10 +72,7 @@ private:
     uint idling = 0;
     const uint idling_limit = 500;
     float idling_pos[3] = {0.0, 0.67, -1.3};
-
-    // 
-    int timeStepT2P = 0;
-    int timeStepT2F = 0;
+    bool brake;
 };
 
 #endif  // TROTTING_H

@@ -40,24 +40,36 @@ void State_Passive::exit(){
 }
 
 FSMStateName State_Passive::checkChange(){
-    if(_lowState->userCmd == UserCommand::L2_A){
-        return FSMStateName::FIXEDSTAND;
-    }
-    else if ((_lowState->userCmd == UserCommand::L2_Y)){
-        #ifdef COMPILE_WITH_MOVE_BASE
-            return FSMStateName::FIXEDSTAND;
-        #endif
-    }
-    else 
-        return FSMStateName::PASSIVE;
+    FSMStateName userState = getStateFromUser();
+    return getNextState(userState);
 }
 
 FSMStateName State_Passive::checkChange(FSMStateName targetState){
+    // return getNextState(targetState); 
     if(targetState == FSMStateName::FIXEDSTAND){
         return FSMStateName::FIXEDSTAND;
     }
     #ifdef COMPILE_WITH_MOVE_BASE
-    else if ((targetState == FSMStateName::MOVE_BASE)){
+    else if (targetState == FSMStateName::MOVE_BASE) {
+        if (timePassed >= waitingTime) {
+            timePassed = 0.0;
+            return FSMStateName::FIXEDSTAND;
+        }
+        else
+            timePassed += _ctrlComp->dt;
+            return FSMStateName::PASSIVE;
+    }
+    #endif
+    else 
+        return FSMStateName::PASSIVE;
+}
+
+FSMStateName State_Passive::getNextState(FSMStateName nextState) {
+    if(nextState == FSMStateName::FIXEDSTAND){
+        return FSMStateName::FIXEDSTAND;
+    }
+    #ifdef COMPILE_WITH_MOVE_BASE
+    else if (nextState == FSMStateName::MOVE_BASE) {
             return FSMStateName::FIXEDSTAND;
     }
     #endif

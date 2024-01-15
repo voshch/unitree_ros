@@ -15,10 +15,8 @@ public:
     void run();
     void exit();
     virtual FSMStateName checkChange();
-
     virtual FSMStateName checkChange(FSMStateName targetState);
-    
-    FSMStateName checkTime4Change();
+    virtual FSMStateName getNextState(FSMStateName nextState);
 protected:
     virtual bool isReached(){
         return _percent == 1.f;
@@ -29,10 +27,8 @@ private:
                             0.0, 0.67, -1.3, 0.0, 0.67, -1.3};
     float _startPos[12];
     float _duration = 1000;   //steps
-    float _percent = 0;       //%
+    float _percent = 0;       // [0,1]
 
-    //
-    int timeStepF2M = 0;
 };
 
 #endif  // FIXEDSTAND_H
